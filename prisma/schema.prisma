@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Dhsjr {
+  character_id       String @id
+  book_id            String?
+  book_name          String?
+  index_in_book      Int?
+  word_index_in_book Int?
+  character          String?
+  character_original String?
+  word               String?
+  word_original      String?
+  word_alphabet      String?
+  word_type          String?
+  pos_in_word        Int?
+  len                String? // shoud be Int, but "1、2" exists in the data
+  shoten             String?
+  shoten_word        String?
+  kana               String?
+  word_kana          String?
+  fanqie             String?
+  ruion              String?
+  hakase             String?
+  etc                String?
+  position_in_book   String?
+  notes              String?
+}
