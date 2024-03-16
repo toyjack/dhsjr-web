@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Noto_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import SideMenu from "@/components/side-menu";
 import SearchPanel from "@/components/search-panel";
+import Providers from "./providers";
 const notoSans = Noto_Sans({ display: "swap", preload: false });
 
 export const metadata: Metadata = {
@@ -21,14 +20,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={"bg-base-200 text-base "+notoSans.className}>
-        <Header />
-        <main className="container mx-auto min-h-screen">
-          <SearchPanel />
-          {children}
-        </main>
-        <Footer />
-        <Script src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js"></Script>
+      <body className={"bg-base-200 text-base " + notoSans.className}>
+        <Providers>
+          <Header />
+          <main className="container mx-auto min-h-screen">
+            <SearchPanel />
+            {children}
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

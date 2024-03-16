@@ -1,5 +1,7 @@
 "use client";
 
+import { perPageAtom } from "@/lib/atoms";
+import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -15,8 +17,10 @@ export default function SearchAllForm() {
   } = useForm<Inputs>();
   const router = useRouter();
 
+  const [perPage] = useAtom(perPageAtom)
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const path = `/results?${new URLSearchParams(data).toString()}`;
+    const path = `/results?${new URLSearchParams(data).toString()}&page=1&perPage=${perPage}`;
     router.push(path);
   };
 

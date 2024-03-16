@@ -4,6 +4,8 @@ import { Inputs } from "@/types";
 import { useRouter } from "next/navigation";
 import { Form, SubmitHandler, useForm } from "react-hook-form";
 import TextInput from "./text-input";
+import { useAtom } from "jotai";
+import { perPageAtom } from "@/lib/atoms";
 
 export default function SearchDetailedForm() {
   const router = useRouter();
@@ -14,8 +16,10 @@ export default function SearchDetailedForm() {
     formState: { errors },
   } = useForm<Inputs>();
 
+  const [perPage] = useAtom(perPageAtom)
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const path = `/results?${new URLSearchParams(data).toString()}`;
+    const path = `/results?${new URLSearchParams(data).toString()}&page=1&perPage=${perPage}`;
     router.push(path);
   };
 

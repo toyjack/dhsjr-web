@@ -1,3 +1,4 @@
+import ResultsTable from "@/components/results-table";
 import { search, searchAll } from "@/lib/db";
 import { Inputs } from "@/types";
 import React from "react";
@@ -13,15 +14,16 @@ export default async function ResultPage({
   }
 
   let data;
-  if(searchParams.query){
-    data = await searchAll(searchParams.query as string);
-  }else{
-    data = await search(searchParams as Inputs);
+  if (searchParams.query) {
+    data = await searchAll(searchParams.query as string, Number(searchParams.page), Number(searchParams.perPage));
+  } else {
+    data = await search(searchParams as Inputs, Number(searchParams.page), Number(searchParams.perPage));
   }
-  
-  return <div>
-    <pre>
-    {JSON.stringify(data, null, 2)}
-    </pre>
-  </div>;
+
+  return (
+    <div>
+      <ResultsTable />
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
 }
