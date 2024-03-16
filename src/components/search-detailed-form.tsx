@@ -24,7 +24,7 @@ export default function SearchDetailedForm() {
       onSubmit={handleSubmit((e) => onSubmit(e))}
       className="flex flex-col w-full px-4 gap-y-4"
     >
-      <p>すべてはAND検索である。</p>
+      <p>すべてはAND検索である。上の全文検索と変容できない。</p>
       <TextInput
         label="word"
         register={register}

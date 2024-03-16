@@ -14,7 +14,7 @@ export default function SearchPanel() {
           className="collapse collapse-plus border border-base-300 bg-base-200"
         >
           <input type="checkbox" className="peer" />
-          <div className="collapse-title text-sm font-medium">詳細検索</div>
+          <div className="collapse-title text-xl font-medium">詳細検索</div>
           <div className="collapse-content">
             <div className="flex flex-col gap-y-4">
               <SearchDetailedForm />
