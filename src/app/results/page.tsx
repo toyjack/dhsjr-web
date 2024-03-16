@@ -1,7 +1,7 @@
+import PerPageSetting from "@/components/per-page-setting";
 import ResultsTable from "@/components/results-table";
 import { search, searchAll } from "@/lib/db";
 import { Inputs } from "@/types";
-import React from "react";
 
 export default async function ResultPage({
   searchParams,
@@ -22,6 +22,7 @@ export default async function ResultPage({
 
   return (
     <div>
+      <PerPageSetting />
       <ResultsTable />
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
