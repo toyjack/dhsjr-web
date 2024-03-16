@@ -22,9 +22,9 @@ export default function SearchDetailedForm() {
   return (
     <form
       onSubmit={handleSubmit((e) => onSubmit(e))}
-      className="flex flex-col w-full px-4 gap-y-4"
+      className="flex flex-col w-full px-2 pt-2 gap-y-4"
     >
-      <p>すべてはAND検索である。上の全文検索と変容できない。</p>
+      <p className="text-base text-base-content">すべてはAND検索である。上の全文検索と変容できない。</p>
       <TextInput
         label="word"
         register={register}
@@ -55,7 +55,7 @@ export default function SearchDetailedForm() {
         fieldLable="仮名（漢語）"
         placeholder="カタカナ"
       />
-      <div className="flex flex-row w-full gap-x-4 pb-4 items-end justify-end">
+      <div className="flex flex-row w-full gap-x-4 pb-2 items-end justify-end">
         <button className="flex-1 btn btn-error w-full max-w-32" onClick={() => reset()}>
           クリア
         </button>
