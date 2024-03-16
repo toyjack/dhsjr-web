@@ -1,6 +1,7 @@
 export type Inputs = {
   word_original: string;
   book_name: string;
+  book_id: string;
   word: string;
   word_alphabet: string;
   word_type: string;

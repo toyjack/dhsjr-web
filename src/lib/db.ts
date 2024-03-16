@@ -123,6 +123,7 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
     ruion:{
       contains: params.ruion,
     },
+    book_id: params.book_id,
   };
   const [results, resultsCount] = await Promise.all([
     prisma.dhsjr.findMany({

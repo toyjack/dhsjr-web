@@ -6,6 +6,7 @@ import { Form, SubmitHandler, useForm } from "react-hook-form";
 import TextInput from "./text-input";
 import { useAtom } from "jotai";
 import { perPageAtom } from "@/lib/atoms";
+import { bookList } from "@/lib/constants";
 
 export default function SearchDetailedForm() {
   const router = useRouter();
@@ -33,13 +34,22 @@ export default function SearchDetailedForm() {
       <p className="text-base text-base-content">
         すべてはAND検索である。上の全文検索と併用できない。
       </p>
-      <TextInput
-        label="word"
-        register={register}
-        fieldLable="単字・漢語"
-        placeholder="漢字を入力"
-        className="input-info"
-      />
+      <div className="flex gap-4">
+        <TextInput
+          label="word"
+          register={register}
+          fieldLable="単字・漢語"
+          placeholder="漢字を入力"
+          className="input-info"
+        />
+        <select className="select select-info select-bordered" {...register("book_id")}>
+          { bookList.map((book)=>{
+            return (
+              <option key={book.book_id} value={book.book_id}>{book.book_name}</option>
+            )
+          })}
+        </select>
+      </div>
       <div className="flex gap-4">
         <TextInput
           label="shoten"
