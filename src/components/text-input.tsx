@@ -14,7 +14,7 @@ export default function TextInput({
   placeholder: string;
 }) {
   return (
-    <label className="input input-bordered input-primary flex items-center gap-2">
+    <label className="input input-bordered input-primary flex items-center gap-2 w-full">
       {fieldLable}
       <input
         type="text"
