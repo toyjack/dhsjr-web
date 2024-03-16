@@ -16,10 +16,12 @@ export default function SearchDetailedForm() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const [perPage] = useAtom(perPageAtom)
+  const [perPage] = useAtom(perPageAtom);
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const path = `/results?${new URLSearchParams(data).toString()}&page=1&perPage=${perPage}`;
+    const path = `/results?${new URLSearchParams(
+      data
+    ).toString()}&page=1&perPage=${perPage}`;
     router.push(path);
   };
 
@@ -36,6 +38,7 @@ export default function SearchDetailedForm() {
         register={register}
         fieldLable="単字・漢語"
         placeholder="漢字を入力"
+        className="input-info"
       />
       <div className="flex gap-4">
         <TextInput
@@ -43,12 +46,14 @@ export default function SearchDetailedForm() {
           register={register}
           fieldLable="声点（単字）"
           placeholder="朱、平、濁など"
+          className="input-info"
         />
         <TextInput
           label="shoten_word"
           register={register}
           fieldLable="声点（漢語）"
           placeholder="上上平など"
+          className="input-info"
         />
       </div>
       <div className="flex gap-4">
@@ -57,12 +62,14 @@ export default function SearchDetailedForm() {
           register={register}
           fieldLable="仮名（単字）"
           placeholder="墨、カタカナ"
+          className="input-info"
         />
         <TextInput
           label="word_kana"
           register={register}
           fieldLable="仮名（漢語）"
           placeholder="カタカナ"
+          className="input-info"
         />
       </div>
 
@@ -72,12 +79,14 @@ export default function SearchDetailedForm() {
           register={register}
           fieldLable="反切"
           placeholder="漢字を入力"
+          className="input-info"
         />
         <TextInput
           label="ruion"
           register={register}
           fieldLable="類音"
           placeholder="漢字を入力"
+          className="input-info"
         />
       </div>
 

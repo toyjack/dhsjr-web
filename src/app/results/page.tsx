@@ -1,3 +1,4 @@
+import PaginationPanel from "@/components/pagination-panel";
 import PerPageSetting from "@/components/per-page-setting";
 import ResultsTable from "@/components/results-table";
 import { search, searchAll } from "@/lib/db";
@@ -20,11 +21,14 @@ export default async function ResultPage({
     data = await search(searchParams as Inputs, Number(searchParams.page), Number(searchParams.perPage));
   }
 
+  const maxPage = Math.ceil(data.meta.count / data.meta.perPage);
+
   return (
     <div>
+      <PaginationPanel maxPage={maxPage} />
       <PerPageSetting />
-      <ResultsTable />
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+      <ResultsTable data={data.data} />
+      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
     </div>
   );
 }

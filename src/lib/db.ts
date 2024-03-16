@@ -117,6 +117,12 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
     word_kana: {
       contains: params.word_kana,
     },
+    fanqie:{
+      contains: params.fanqie,
+    },
+    ruion:{
+      contains: params.ruion,
+    },
   };
   const [results, resultsCount] = await Promise.all([
     prisma.dhsjr.findMany({

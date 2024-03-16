@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Inputs } from "@/types";
 import React from "react";
 import { Path, UseFormRegister } from "react-hook-form";
@@ -7,14 +8,16 @@ export default function TextInput({
   register,
   fieldLable,
   placeholder,
+  className,
 }: {
   label: Path<Inputs>;
   register: UseFormRegister<Inputs>;
   fieldLable: string;
   placeholder: string;
+  className?: string;
 }) {
   return (
-    <label className="input input-bordered input-primary flex items-center gap-2 w-full">
+    <label className={cn("input input-bordered input-primary flex items-center gap-2 w-full", className)}>
       {fieldLable}
       <input
         type="text"

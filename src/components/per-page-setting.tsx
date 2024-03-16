@@ -23,6 +23,7 @@ export default function PerPageSetting() {
     setPerPage(Number(e.target.value));
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set("perPage", e.target.value);
+    newSearchParams.set("page", "1");
     const newUrl = `${pathname}?${newSearchParams.toString()}`
     // console.log(newUrl)
     route.push(newUrl);
@@ -31,7 +32,7 @@ export default function PerPageSetting() {
   return (
     <>
       <select
-        className="select select-bordered w-full max-w-xs"
+        className="select select-bordered select-info w-full max-w-xs"
         value={perPage}
         onChange={(e) => handleChange(e)}
       >
