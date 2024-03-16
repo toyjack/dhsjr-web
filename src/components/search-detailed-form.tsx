@@ -25,7 +25,7 @@ export default function SearchDetailedForm() {
       className="flex flex-col w-full px-2 pt-2 gap-y-4"
     >
       <p className="text-base text-base-content">
-        すべてはAND検索である。上の全文検索と変容できない。
+        すべてはAND検索である。上の全文検索と併用できない。
       </p>
       <TextInput
         label="word"
