@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Form, SubmitHandler, useForm } from "react-hook-form";
 import TextInput from "./text-input";
 
-export default function SearchForm() {
+export default function SearchDetailedForm() {
   const router = useRouter();
   const {
     register,
@@ -15,8 +15,6 @@ export default function SearchForm() {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
-
     const path = `/results?${new URLSearchParams(data).toString()}`;
     router.push(path);
   };
@@ -24,7 +22,7 @@ export default function SearchForm() {
   return (
     <form
       onSubmit={handleSubmit((e) => onSubmit(e))}
-      className="flex flex-col w-full pt-10 px-4 gap-y-4"
+      className="flex flex-col w-full px-4 gap-y-4"
     >
       <p>すべてはAND検索である。</p>
       <TextInput
@@ -57,15 +55,14 @@ export default function SearchForm() {
         fieldLable="仮名（漢語）"
         placeholder="カタカナ"
       />
-
-      <div className="flex flex-row w-full gap-x-4 pb-4">
-        <button className="flex-1 btn btn-error w-full" onClick={() => reset()}>
+      <div className="flex flex-row w-full gap-x-4 pb-4 items-end justify-end">
+        <button className="flex-1 btn btn-error w-full max-w-32" onClick={() => reset()}>
           クリア
         </button>
         <input
           type="submit"
-          className="flex-1 btn btn-primary w-full"
-          value="検索"
+          className="flex-1 btn btn-primary w-full max-w-32"
+          value="詳細検索"
         />
       </div>
     </form>

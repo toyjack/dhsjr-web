@@ -1,4 +1,4 @@
-import SearchForm from "./search-form";
+import SearchDetailedForm from "./search-detailed-form";
 
 export default function SideMenu({ children }: { children: React.ReactNode }) {
   return (
@@ -26,7 +26,7 @@ export default function SideMenu({ children }: { children: React.ReactNode }) {
         ></label>
 
         <div className="bg-base-100">
-          <SearchForm />
+          <SearchDetailedForm />
         </div>
       </div>
     </div>
