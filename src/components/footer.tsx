@@ -23,7 +23,9 @@ export default function Footer() {
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className="h-6 w-6 fill-slate-900"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="h-6 w-6"
     >
       <path
         fillRule="evenodd"

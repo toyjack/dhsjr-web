@@ -5,6 +5,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import SearchPanel from "@/components/search-panel";
 import Providers from "./providers";
+import { cn } from "@/lib/utils";
 const notoSans = Noto_Sans({ display: "swap", preload: false });
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={"bg-base-200 text-base " + notoSans.className}>
+      <body className={cn("bg-base-200 text-base flex flex-col w-full items-center",notoSans.className)}>
         <Providers>
           <Header />
           <main className="container mx-auto min-h-screen">

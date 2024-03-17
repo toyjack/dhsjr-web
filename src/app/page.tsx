@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <section className="pt-4">
+    <section className="p-4">
       <article className="prose max-w-none">
         <h2>本ウェブアプリについて</h2>
         <p>

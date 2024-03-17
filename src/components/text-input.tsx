@@ -8,7 +8,6 @@ export default function TextInput({
   register,
   fieldLable,
   placeholder,
-  className,
 }: {
   label: Path<Inputs>;
   register: UseFormRegister<Inputs>;
@@ -17,14 +16,21 @@ export default function TextInput({
   className?: string;
 }) {
   return (
-    <label className={cn("input input-bordered input-primary flex items-center gap-2 w-full", className)}>
-      {fieldLable}
+    <label className="form-control w-full">
+      <div className="label">
+        <span className="label-text">{fieldLable}</span>
+        {/* <span className="label-text-alt">Top Right label</span> */}
+      </div>
       <input
         type="text"
-        className="grow"
         placeholder={placeholder}
+        className="input input-bordered input-info w-full"
         {...register(label)}
       />
+      {/* <div className="label"> */}
+        {/* <span className="label-text-alt">Bottom Left label</span> */}
+        {/* <span className="label-text-alt">Bottom Right label</span> */}
+      {/* </div> */}
     </label>
   );
 }

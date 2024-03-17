@@ -29,74 +29,86 @@ export default function SearchDetailedForm() {
   return (
     <form
       onSubmit={handleSubmit((e) => onSubmit(e))}
-      className="flex flex-col w-full px-2 pt-2 gap-y-4"
+      className="flex flex-col w-full md:p-2 gap-y-4"
     >
       <p className="text-base text-base-content">
         すべてはAND検索である。上の全文検索と併用できない。
       </p>
-      <div className="flex gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="word"
           register={register}
           fieldLable="単字・漢語"
           placeholder="漢字を入力"
-          className="input-info"
         />
-        <select className="select select-info select-bordered" {...register("book_id")}>
-          { bookList.map((book)=>{
+
+        <label className="form-control w-full">
+          <div className="label">
+            <span className="label-text">資料名</span>
+            {/* <span className="label-text-alt">Alt label</span> */}
+          </div>
+          <select className="select select-bordered select-info w-full" {...register("book_id")}>
+            <option value={""}>
+              資料を選らぶ
+            </option>
+            {bookList.map((book) => {
             return (
-              <option key={book.book_id} value={book.book_id}>{book.book_name}</option>
-            )
+              <option key={book.book_id} value={book.book_id}>
+                {book.book_name}
+              </option>
+            );
           })}
-        </select>
+          </select>
+          {/* <div className="label">
+            <span className="label-text-alt">Alt label</span>
+            <span className="label-text-alt">Alt label</span>
+          </div> */}
+        </label>
       </div>
-      <div className="flex gap-4">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="shoten"
           register={register}
           fieldLable="声点（単字）"
           placeholder="朱、平、濁など"
-          className="input-info"
+          className="input-info basis-1/2"
         />
         <TextInput
           label="shoten_word"
           register={register}
           fieldLable="声点（漢語）"
           placeholder="上上平など"
-          className="input-info"
+          className="input-info basis-1/2"
         />
       </div>
-      <div className="flex gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="kana"
           register={register}
           fieldLable="仮名（単字）"
           placeholder="墨、カタカナ"
-          className="input-info"
         />
         <TextInput
           label="word_kana"
           register={register}
           fieldLable="仮名（漢語）"
           placeholder="カタカナ"
-          className="input-info"
         />
       </div>
 
-      <div className="flex gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="fanqie"
           register={register}
           fieldLable="反切"
           placeholder="漢字を入力"
-          className="input-info"
         />
         <TextInput
           label="ruion"
           register={register}
           fieldLable="類音"
           placeholder="漢字を入力"
-          className="input-info"
         />
       </div>
 
@@ -109,7 +121,7 @@ export default function SearchDetailedForm() {
         </button>
         <input
           type="submit"
-          className="flex-1 btn btn-primary w-full max-w-32"
+          className="flex-1 btn btn-info w-full max-w-32"
           value="詳細検索"
         />
       </div>
