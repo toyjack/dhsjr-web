@@ -16,19 +16,32 @@ export default async function ResultPage({
 
   let data;
   if (searchParams.query) {
-    data = await searchAll(searchParams.query as string, Number(searchParams.page), Number(searchParams.perPage));
+    data = await searchAll(
+      searchParams.query as string,
+      Number(searchParams.page),
+      Number(searchParams.perPage)
+    );
   } else {
-    data = await search(searchParams as Inputs, Number(searchParams.page), Number(searchParams.perPage));
+    data = await search(
+      searchParams as Inputs,
+      Number(searchParams.page),
+      Number(searchParams.perPage)
+    );
   }
 
   const maxPage = Math.ceil(data.meta.count / data.meta.perPage);
 
   return (
-    <div>
-      <PaginationPanel maxPage={maxPage} />
-      <PerPageSetting />
+    <div className="">
+      <div className="flex justify-between gap-4 p-2">
+        <PaginationPanel maxPage={maxPage} />
+        <PerPageSetting />
+      </div>
       <ResultsTable data={data.data} />
-      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
+      <div className="flex justify-between gap-4 p-2">
+        <PaginationPanel maxPage={maxPage} />
+        <PerPageSetting />
+      </div>
     </div>
   );
 }

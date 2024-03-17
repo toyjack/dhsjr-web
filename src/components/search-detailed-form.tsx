@@ -34,6 +34,7 @@ export default function SearchDetailedForm() {
       <p className="text-base text-base-content">
         すべてはAND検索である。上の全文検索と併用できない。
       </p>
+      {/* TODO divide 漢字　漢語 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="word"
