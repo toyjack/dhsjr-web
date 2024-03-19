@@ -15,14 +15,16 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
+  params,
   children,
-}: Readonly<{
+}: {
+  params: { locale: string };
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="ja">
       <body className={cn("bg-base-200 text-base flex flex-col w-full items-center",notoSans.className)}>
-        <Providers>
+        <Providers locale={params.locale}>
           <Header />
           <main className="container mx-auto min-h-screen">
             <SearchPanel />
