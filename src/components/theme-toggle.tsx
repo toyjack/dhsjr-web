@@ -1,14 +1,19 @@
-import React from "react";
+"use client";
+
+import { themeAtom } from "@/lib/atoms";
+import { cn } from "@/lib/utils";
+import { useAtom } from "jotai";
+import { ChangeEvent } from "react";
 
 export default function ThemeToggle() {
-  const SunIcon = () => (
+  const SunIcon = ({ className }: { className?: string }) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="w-6 h-6"
+      className={cn("w-6 h-6", className)}
     >
       <path
         strokeLinecap="round"
@@ -18,14 +23,14 @@ export default function ThemeToggle() {
     </svg>
   );
 
-  const MoonIcon = () => (
+  const MoonIcon = ({ className }: { className?: string }) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="w-6 h-6"
+      className={cn("w-6 h-6", className)}
     >
       <path
         strokeLinecap="round"
@@ -34,9 +39,28 @@ export default function ThemeToggle() {
       />
     </svg>
   );
+
+  const [theme, setTheme] = useAtom(themeAtom);
+
+  const toggleTheme = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.checked);
+    if (e.target.checked) {
+      setTheme("light");
+    }
+    if (!e.target.checked) {
+      setTheme("dark");
+    }
+  };
+
   return (
-    <div>
-      <SunIcon />
-    </div>
+    <label className="swap">
+      <input
+        type="checkbox"
+        checked={theme==="light"}
+        onChange={(e) => toggleTheme(e)}
+      />
+      <SunIcon className="swap-on" />
+      <MoonIcon className="swap-off" />
+    </label>
   );
 }

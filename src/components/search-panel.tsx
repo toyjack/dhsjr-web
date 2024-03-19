@@ -4,9 +4,7 @@ import SearchAllForm from "./search-all-form";
 
 export default function SearchPanel() {
   return (
-    <div className="w-full py-2 my-2 md:p-4 md:m-4 bg-base-300 md:shadow flex flex-col justify-center items-center md:w-full">
-      {/* <h2 className="text-xl font-bold p-4">検索</h2> */}
-
+    <div className="w-full py-2 my-2 bg-base-300 md:shadow flex flex-col justify-center items-center lg:w-full">
       <div className="flex flex-col max-w-5xl w-full gap-y-4 px-2">
         <SearchAllForm />
 
