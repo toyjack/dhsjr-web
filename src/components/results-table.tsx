@@ -1,12 +1,11 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { Dhsjr } from "@prisma/client";
 import RubyCell from "./ruby-cell";
 
 export default function ResultsTable({ data }: { data: Dhsjr[] }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto w-full">
       <table className="table">
         <thead>
           <tr>

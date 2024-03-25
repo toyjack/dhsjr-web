@@ -40,7 +40,9 @@ export default function RubyCell({
         </rt>
         <rp>)</rp>
       </ruby>
-      {subText && `(${subText})`}
+      <span className="text-xs">
+      {subText && `${subText}`}
+      </span>
     </>
   );
 }

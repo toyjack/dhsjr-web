@@ -33,7 +33,7 @@ export default async function ResultPage({
   const maxPage = Math.ceil(data.meta.count / data.meta.perPage);
 
   return (
-    <div className="">
+    <div className="w-full">
       <div className="flex justify-between gap-4 p-2">
         <PaginationPanel maxPage={maxPage} />
         <PerPageSetting />
