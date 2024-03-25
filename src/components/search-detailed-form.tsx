@@ -7,8 +7,10 @@ import TextInput from "./text-input";
 import { useAtom } from "jotai";
 import { perPageAtom } from "@/lib/atoms";
 import { bookList } from "@/lib/constants";
+import { useI18n } from "@/locales/client";
 
 export default function SearchDetailedForm() {
+  const t = useI18n();
   const router = useRouter();
   const {
     register,
@@ -123,7 +125,7 @@ export default function SearchDetailedForm() {
         <input
           type="submit"
           className="flex-1 btn btn-info w-full max-w-32"
-          value="詳細検索"
+          value={t("advancedSearch")}
         />
       </div>
     </form>

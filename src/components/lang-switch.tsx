@@ -20,7 +20,7 @@ export default function LangSwitch() {
     </svg>
   );
 
-  const changeLocale = useChangeLocale()
+  const changeLocale = useChangeLocale({preserveSearchParams: true})
   const locale = useCurrentLocale()
 
   return (

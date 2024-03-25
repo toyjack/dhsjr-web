@@ -11,6 +11,7 @@ export default async function ResultPage({
 }) {
   // TODO check if string in searchParams is empty
   if (!searchParams) {
+    // add i18n
     return <div>検索条件が指定されていません。</div>;
   }
 

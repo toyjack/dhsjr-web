@@ -1,8 +1,11 @@
 import React from "react";
 import SearchDetailedForm from "./search-detailed-form";
 import SearchAllForm from "./search-all-form";
+import { getI18n } from "@/locales/server";
 
-export default function SearchPanel() {
+export default async function SearchPanel() {
+  const t = await getI18n();
+
   return (
     <div className="w-full py-2 my-2 bg-base-300 md:shadow flex flex-col justify-center items-center lg:w-full">
       <div className="flex flex-col max-w-5xl w-full gap-y-4 px-2">
@@ -14,7 +17,7 @@ export default function SearchPanel() {
         >
           <input type="checkbox" className="peer" />
           <div className="collapse-title text-sm md:text-xl font-medium">
-            詳細検索
+            {t("advancedSearch")}
           </div>
           <div className="collapse-content">
             <div className="flex flex-col gap-y-4">
