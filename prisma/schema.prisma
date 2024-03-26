@@ -38,3 +38,15 @@ model Dhsjr {
   position_in_book   String?
   notes              String?
 }
+
+model Book {
+  book_id   String @id
+  book_name String
+  era    String?
+  owner String?
+  publish_image      String?
+  legend     String?
+  jion_info  String?
+  references  String?
+  inputor    String?
+}
