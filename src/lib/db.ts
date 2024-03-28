@@ -99,6 +99,9 @@ export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
 
 export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
   const where ={
+    character: {
+      contains: params.word,
+    },
     word: {
       contains: params.word,
     },
@@ -123,7 +126,7 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
     ruion:{
       contains: params.ruion,
     },
-    book_id: params.book_id,
+    book_id: params.book_id || undefined,
   };
   const [results, resultsCount] = await Promise.all([
     prisma.dhsjr.findMany({
