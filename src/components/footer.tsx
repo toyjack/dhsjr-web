@@ -37,7 +37,22 @@ export default function Footer() {
   return (
     <footer className="footer p-10 bg-base-300 text-base-content">
       <aside>
-        <p>Copyright © Daikaku Kato, Guanwei Liu</p>
+        <p>
+          Copyright ©{" "}
+          <Link
+            className="link link-hover"
+            href="https://researchmap.jp/read0135868"
+          >
+            Daikaku Kato
+          </Link>
+          ,{" "}
+          <Link
+            className="link link-hover"
+            href="https://researchmap.jp/liuguanwei"
+          >
+            Guanwei Liu
+          </Link>
+        </p>
       </aside>
       <nav className="grid-flow-col gap-4 md:place-self-center md:justify-self-end">
         <Link
