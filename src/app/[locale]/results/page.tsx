@@ -2,6 +2,7 @@ import PaginationPanel from "@/components/pagination-panel";
 import PerPageSetting from "@/components/per-page-setting";
 import ResultsTable from "@/components/results-table";
 import { search, searchAll } from "@/lib/db";
+import { getI18n } from "@/locales/server";
 import { Inputs } from "@/types";
 
 export default async function ResultPage({
@@ -32,15 +33,19 @@ export default async function ResultPage({
 
   const maxPage = Math.ceil(data.meta.count / data.meta.perPage);
 
+  const t = await getI18n();
+
   return (
     <div className="w-full">
-      <div className="flex justify-between gap-4 p-2">
+      <div className="flex justify-between items-center gap-4 p-2">
         <PaginationPanel maxPage={maxPage} />
+        <span>{t("resultsCount", { count: data.meta.count })}</span>
         <PerPageSetting />
       </div>
       <ResultsTable data={data.data} />
-      <div className="flex justify-between gap-4 p-2">
+      <div className="flex justify-between items-center gap-4 p-2">
         <PaginationPanel maxPage={maxPage} />
+        <span>{t("resultsCount", { count: data.meta.count })}</span>
         <PerPageSetting />
       </div>
     </div>

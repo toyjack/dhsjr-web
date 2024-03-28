@@ -15,4 +15,5 @@ export default {
   fanqie: "反切",
   ruion: "類音",
   shozai: "所在",
+  resultsCount: "検索結果：{count}件", 
 } as const;

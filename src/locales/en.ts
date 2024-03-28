@@ -15,4 +15,7 @@ export default {
   fanqie: "Fanqie",
   ruion: "Ruion",
   shozai: "Location",
+  "resultsCount#zero": "No results",
+  "resultsCount#one": "Search Results：{count} result",
+  "resultsCount#other": "Search Results：{count} results",
 } as const;
