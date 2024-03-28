@@ -3,27 +3,35 @@
 import { Dhsjr } from "@prisma/client";
 import RubyCell from "./ruby-cell";
 import Link from "next/link";
+import { useI18n } from "@/locales/client";
 
 export default function ResultsTable({ data }: { data: Dhsjr[] }) {
+  const t = useI18n();
+
   return (
     <div className="overflow-x-auto w-full">
       <table className="table">
         <thead>
           <tr>
-            <th>character_id</th>
-            <th>book_name</th>
+            <th>{t("id")}</th>
+            <th>
+              <div>
+                <div>{t("bookName")}</div>
+                <div>{t("positionInBook")}</div>
+              </div>
+            </th>
             <th>
               <RubyCell
-                baseText="character(fanqie, ruion)"
-                rubyTop="shoten"
-                rubyBottom="kana"
+                baseText={`${t("character")}(${t("fanqie")}, ${t("ruion")})`}
+                rubyTop={t("shoten")}
+                rubyBottom={t("kanachu")}
               />
             </th>
             <th>
               <RubyCell
-                baseText="word"
-                rubyTop="shoten_word"
-                rubyBottom="word_kana"
+                baseText={t("word")}
+                rubyTop={t("shotengata")}
+                rubyBottom={t("kanagata")}
               />
             </th>
           </tr>
@@ -49,7 +57,7 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                       {row.book_name}
                     </Link>
                   </div>
-                  <div>{row.position_in_book}</div>
+                  <div>{t("shozai")}：{row.position_in_book}</div>
                 </div>
               </td>
               <td className="text-base-content text-2xl font-semibold">
@@ -63,13 +71,13 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
               </td>
               <td className="text-2xl">
                 {/* TODO word's id  */}
-                <Link href={`/word/${row.book_id}-${row.word_index_in_book}`}>
+                {/* <Link href={`/word/${row.book_id}-${row.word_index_in_book}`}> */}
                   <RubyCell
                     baseText={row.word}
                     rubyTop={row.shoten_word}
                     rubyBottom={row.word_kana}
                   />
-                </Link>
+                {/* </Link> */}
               </td>
             </tr>
           ))}

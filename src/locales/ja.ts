@@ -1,6 +1,18 @@
 export default {
-  'navBarTitle': '横断漢字音簡易検索',
-  'search': '検索',
-  'advancedSearch':"詳細検索",
-  'perPage': '{count}件表示',
-} as const
+  navBarTitle: "横断漢字音簡易検索",
+  search: "検索",
+  advancedSearch: "詳細検索",
+  perPage: "{count}件表示",
+  id: "ID",
+  bookName: "資料名",
+  positionInBook: "出現位置",
+  character: "単字",
+  shoten: "声点",
+  kanachu: "仮名注",
+  word: "漢語",
+  shotengata: "声点型",
+  kanagata: "仮名型",
+  fanqie: "反切",
+  ruion: "類音",
+  shozai: "所在",
+} as const;

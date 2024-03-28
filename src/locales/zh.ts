@@ -1,6 +1,18 @@
 export default {
-  'navBarTitle': '交叉汉字音简易检索',
-  'search': '搜索',
-  'advancedSearch':"详细搜索",
-  'perPage': '显示{count}件',
-} as const
+  navBarTitle: "交叉汉字音简易检索",
+  search: "搜索",
+  advancedSearch: "详细搜索",
+  perPage: "显示{count}件",
+  id: "ID",
+  bookName: "资料名",
+  positionInBook: "出现位置",
+  character: "单字",
+  shoten: "声点",
+  kanachu: "假名注",
+  word: "汉语",
+  shotengata: "声点型",
+  kanagata: "假名型",
+  fanqie: "反切",
+  ruion: "类音",
+  shozai: "所在",
+} as const;

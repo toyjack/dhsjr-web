@@ -1,6 +1,18 @@
 export default {
-  'navBarTitle': 'DHSJR',
-  'search': 'Search',
-  'advancedSearch':"Advanced Search",
-  'perPage': 'Display {count} rows',
-} as const
+  navBarTitle: "DHSJR",
+  search: "Search",
+  advancedSearch: "Advanced Search",
+  perPage: "Display {count} rows",
+  id: "ID",
+  bookName: "Book Name",
+  positionInBook: "Position in Book",
+  character: "Character",
+  shoten: "Shoten",
+  kanachu: "Kanachu",
+  word: "Word",
+  shotengata: "Shoten",
+  kanagata: "Kana",
+  fanqie: "Fanqie",
+  ruion: "Ruion",
+  shozai: "Location",
+} as const;
