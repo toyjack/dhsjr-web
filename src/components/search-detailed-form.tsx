@@ -1,15 +1,15 @@
 "use client";
 
-import { Inputs } from "@/types";
+import { BookList, Inputs } from "@/types";
 import { useRouter } from "next/navigation";
 import { Form, SubmitHandler, useForm } from "react-hook-form";
 import TextInput from "./text-input";
 import { useAtom } from "jotai";
 import { perPageAtom } from "@/lib/atoms";
-import { bookList } from "@/lib/constants";
+// import { bookList } from "@/lib/constants";
 import { useI18n } from "@/locales/client";
 
-export default function SearchDetailedForm() {
+export default function SearchDetailedForm({bookList}:{bookList:BookList}) {
   const t = useI18n();
   const router = useRouter();
   const {

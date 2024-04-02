@@ -1,8 +1,16 @@
-import { Inputs } from "@/types";
+import { BookList, Inputs } from "@/types";
 import { prisma } from "./prisma";
 
 const PAGE = 1;
 const PER_PAGE = 100;
+
+export async function getBookList(){
+  const results = await prisma.dhsjr.groupBy({
+    by: ["book_id","book_name"],
+  })
+
+  return results as BookList
+}
 
 export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
   const where = {

@@ -2,9 +2,12 @@ import React from "react";
 import SearchDetailedForm from "./search-detailed-form";
 import SearchAllForm from "./search-all-form";
 import { getI18n } from "@/locales/server";
+import { getBookList } from "@/lib/db";
 
 export default async function SearchPanel() {
   const t = await getI18n();
+  const bookList = await getBookList();
+  // console.log(bookList);
 
   return (
     <div className="w-full py-2 my-2 bg-base-300 md:shadow flex flex-col justify-center items-center lg:w-full">
@@ -21,7 +24,7 @@ export default async function SearchPanel() {
           </div>
           <div className="collapse-content">
             <div className="flex flex-col gap-y-4">
-              <SearchDetailedForm />
+              <SearchDetailedForm bookList={bookList} />
             </div>
           </div>
         </div>

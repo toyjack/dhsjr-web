@@ -17,3 +17,8 @@ export type Inputs = {
   etc: string;
   notes: string;
 };
+
+export type BookList={
+  book_id: string;
+  book_name: string;
+}[]
