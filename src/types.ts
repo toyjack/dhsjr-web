@@ -1,4 +1,5 @@
 export type Inputs = {
+  character: string;
   word_original: string;
   book_name: string;
   book_id: string;

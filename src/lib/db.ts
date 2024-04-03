@@ -108,34 +108,37 @@ export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
 export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
   const where ={
     character: {
-      contains: params.word,
+      contains: params.character || undefined,
     },
     word: {
-      contains: params.word,
+      contains: params.word || undefined,
     },
     book_name: {
-      contains: params.book_name,
+      contains: params.book_name || undefined,
     },
     shoten: {
-      contains: params.shoten,
+      contains: params.shoten || undefined,
     },
     kana: {
-      contains: params.kana,
+      contains: params.kana || undefined,
     },
     shoten_word: {
-      contains: params.shoten_word,
+      contains: params.shoten_word || undefined,
     },
     word_kana: {
-      contains: params.word_kana,
+      contains: params.word_kana || undefined,
     },
     fanqie:{
-      contains: params.fanqie,
+      contains: params.fanqie || undefined,
     },
     ruion:{
-      contains: params.ruion,
+      contains: params.ruion || undefined,
     },
-    book_id: params.book_id || undefined,
+    book_id:{
+      contains: params.book_id || undefined,
+    },
   };
+  console.log(where);
   const [results, resultsCount] = await Promise.all([
     prisma.dhsjr.findMany({
       skip: (page - 1) * perPage,
