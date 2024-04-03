@@ -7,6 +7,9 @@ const PER_PAGE = 100;
 export async function getBookList() {
   const results = await prisma.dhsjr.groupBy({
     by: ["book_id", "book_name"],
+    orderBy: {
+      book_id: "asc",
+    },
   });
 
   return results as BookList;

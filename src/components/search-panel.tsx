@@ -7,7 +7,6 @@ import { getBookList } from "@/lib/db";
 export default async function SearchPanel() {
   const t = await getI18n();
   const bookList = await getBookList();
-  // console.log(bookList);
 
   return (
     <div className="w-full py-2 my-2 bg-base-300 md:shadow flex flex-col justify-center items-center lg:w-full">

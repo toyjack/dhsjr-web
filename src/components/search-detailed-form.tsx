@@ -70,7 +70,7 @@ export default function SearchDetailedForm({
             {bookList.map((book) => {
               return (
                 <option key={book.book_id} value={book.book_id}>
-                  {book.book_name}
+                  {book.book_id}{" "}{book.book_name}
                 </option>
               );
             })}
