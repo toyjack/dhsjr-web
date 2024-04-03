@@ -9,7 +9,11 @@ import { perPageAtom } from "@/lib/atoms";
 // import { bookList } from "@/lib/constants";
 import { useI18n } from "@/locales/client";
 
-export default function SearchDetailedForm({bookList}:{bookList:BookList}) {
+export default function SearchDetailedForm({
+  bookList,
+}: {
+  bookList: BookList;
+}) {
   const t = useI18n();
   const router = useRouter();
   const {
@@ -39,33 +43,38 @@ export default function SearchDetailedForm({bookList}:{bookList:BookList}) {
       {/* TODO divide 漢字　漢語 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
-          label="word"
+          label="character"
           register={register}
-          fieldLable="単字・漢語"
+          fieldLable="単字"
           placeholder="漢字を入力"
         />
 
-        <label className="form-control w-full">
+        <TextInput
+          label="word"
+          register={register}
+          fieldLable="漢語"
+          placeholder="漢字を入力"
+        />
+      </div>
+
+      <div className="grid grid-cols-1">
+      <label className="form-control w-full">
           <div className="label">
             <span className="label-text">資料名</span>
-            {/* <span className="label-text-alt">Alt label</span> */}
           </div>
-          <select className="select select-bordered select-info w-full" {...register("book_id")}>
-            <option value={""}>
-              資料を選らぶ
-            </option>
+          <select
+            className="select select-bordered select-info w-full"
+            {...register("book_id")}
+          >
+            <option value={""}>資料を選らぶ</option>
             {bookList.map((book) => {
-            return (
-              <option key={book.book_id} value={book.book_id}>
-                {book.book_name}
-              </option>
-            );
-          })}
+              return (
+                <option key={book.book_id} value={book.book_id}>
+                  {book.book_name}
+                </option>
+              );
+            })}
           </select>
-          {/* <div className="label">
-            <span className="label-text-alt">Alt label</span>
-            <span className="label-text-alt">Alt label</span>
-          </div> */}
         </label>
       </div>
 
