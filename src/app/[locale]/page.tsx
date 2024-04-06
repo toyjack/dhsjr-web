@@ -19,7 +19,7 @@ export default function Home() {
           を利用しています。データの更新は不定期に行われます。
         </p>
         <p>
-          DHSJRの全体に関してはは次の文章または
+          DHSJRの全体に関しては次の文章または
           <Link className="link link-hover" href="https://dhsjr.w.waseda.jp/">
             リンク
           </Link>
@@ -85,7 +85,7 @@ export default function Home() {
         </p>
 
         <p>
-          ご連絡は、このサイトの管理人である加藤大鶴（katou■atomi.ac.jp、■は@に読み替えてください）宛にお願いいたします。
+          ご連絡は、このサイトの管理人である加藤大鶴（daikaku.kato■waseda.jp、■は@に読み替えてください）宛にお願いいたします。
         </p>
 
         <p>

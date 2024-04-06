@@ -66,7 +66,7 @@ export default function SearchDetailedForm({
             className="select select-bordered select-info w-full"
             {...register("book_id")}
           >
-            <option value={""}>資料を選らぶ</option>
+            <option value={""}>資料を選ぶ</option>
             {bookList.map((book) => {
               return (
                 <option key={book.book_id} value={book.book_id}>
