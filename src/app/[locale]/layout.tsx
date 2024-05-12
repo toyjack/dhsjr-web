@@ -6,6 +6,7 @@ import Footer from "@/components/footer";
 import SearchPanel from "@/components/search-panel";
 import Providers from "./providers";
 import { cn } from "@/lib/utils";
+import { GoogleAnalytics } from "@next/third-parties/google";
 const notoSans = Noto_Sans({ display: "swap", preload: false });
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export default function RootLayout({
           <Footer />
         </Providers>
       </body>
+      <GoogleAnalytics gaId="G-6LZ8NQH8RL" />
     </html>
   );
 }

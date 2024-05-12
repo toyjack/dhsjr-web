@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/third-parties": "^14.2.3",
     "@prisma/client": "5.11.0",
     "clsx": "^2.1.0",
     "jotai": "^2.7.1",
