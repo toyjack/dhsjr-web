@@ -7,6 +7,7 @@ import SearchPanel from "@/components/search-panel";
 import Providers from "./providers";
 import { cn } from "@/lib/utils";
 import { GoogleAnalytics } from "@next/third-parties/google";
+
 const notoSans = Noto_Sans({ display: "swap", preload: false });
 
 export const metadata: Metadata = {
@@ -24,14 +25,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className={cn("bg-base-200 text-base flex flex-col w-full items-center",notoSans.className)}>
+      <body>
         <Providers locale={params.locale}>
-          <Header />
-          <main className="container mx-auto min-h-screen">
-            <SearchPanel />
-            {children}
-          </main>
-          <Footer />
+          <div
+            className={cn(
+              "bg-base-200 text-base flex flex-col w-full items-center",
+              notoSans.className,
+            )}
+          >
+            <Header />
+            <main className="container mx-auto min-h-screen">
+              <SearchPanel />
+              {children}
+            </main>
+            <Footer />
+          </div>
         </Providers>
       </body>
       <GoogleAnalytics gaId="G-6LZ8NQH8RL" />
