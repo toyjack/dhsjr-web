@@ -9,7 +9,7 @@ export default function Home() {
           本ウェブアプリは、資料横断的な漢字音・漢語音データベース（DHSJR）の検索・閲覧を行うためのウェブアプリです。
         </p>
         <p>
-          現在、DHSJRの20240315版の
+          現在、DHSJRの20240527版の
           <Link
             className="link link-hover"
             href="https://dhsjr.w.waseda.jp/?page_id=19"
