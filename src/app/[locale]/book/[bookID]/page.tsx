@@ -14,7 +14,6 @@ export default async function BookPage({
 
   return (
     <div className="p-1 md:p-4">
-      BookPage:{params.bookID}
       <div className="prose max-w-none">
         <ReactMarkdown>{bookData}</ReactMarkdown>
       </div>

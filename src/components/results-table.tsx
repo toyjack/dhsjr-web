@@ -67,6 +67,7 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                   rubyBottom={row.kana}
                   fanqie={row.fanqie}
                   ruion={row.ruion}
+                  href={`/character/${row.character_id}`}
                 />
               </td>
               <td className="text-2xl">
