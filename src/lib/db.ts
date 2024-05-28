@@ -135,6 +135,9 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
     ruion: {
       contains: params.ruion || undefined,
     },
+    etc:{
+      contains: params.etc || undefined,
+    },
     book_id: params.book_id || undefined,
   };
 

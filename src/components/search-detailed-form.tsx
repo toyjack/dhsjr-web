@@ -2,11 +2,10 @@
 
 import { BookList, Inputs } from "@/types";
 import { useRouter } from "next/navigation";
-import { Form, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import TextInput from "./text-input";
 import { useAtom } from "jotai";
 import { perPageAtom } from "@/lib/atoms";
-// import { bookList } from "@/lib/constants";
 import { useI18n } from "@/locales/client";
 
 export default function SearchDetailedForm({
@@ -121,6 +120,15 @@ export default function SearchDetailedForm({
           register={register}
           fieldLable="類音"
           placeholder="漢字を入力"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <TextInput
+          label="etc"
+          register={register}
+          fieldLable="その他"
+          placeholder=""
         />
       </div>
 
