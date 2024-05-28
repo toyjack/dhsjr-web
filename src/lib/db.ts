@@ -138,6 +138,9 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
     etc:{
       contains: params.etc || undefined,
     },
+    notes:{
+      contains: params.notes || undefined,
+    },
     book_id: params.book_id || undefined,
   };
 

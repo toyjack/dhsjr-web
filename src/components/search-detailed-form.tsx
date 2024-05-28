@@ -130,6 +130,12 @@ export default function SearchDetailedForm({
           fieldLable="その他"
           placeholder=""
         />
+        <TextInput
+          label="notes"
+          register={register}
+          fieldLable="備考"
+          placeholder=""
+        />
       </div>
 
       <div className="flex flex-row w-full gap-x-4 pb-2 items-end justify-end">
