@@ -34,6 +34,7 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                 rubyBottom={t("kanagata")}
               />
             </th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -79,6 +80,14 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                     rubyBottom={row.word_kana}
                   />
                 {/* </Link> */}
+              </td>
+              <td>
+              <Link
+                  href={`/character/${row.character_id}`}
+                  className="btn btn-primary"
+                >
+                  詳細
+                </Link>
               </td>
             </tr>
           ))}
