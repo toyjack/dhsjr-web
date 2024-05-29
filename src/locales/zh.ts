@@ -36,4 +36,5 @@ export default {
   search_form_input_shoten_word_placeholder:"“上上平”等等",
   search_form_input_kana_placeholder:"“墨”、片假名",
   search_form_input_kana_word_placeholder:"片假名",
+  search_all_form_placeholder: "输入任意内容进行全文搜索",
 } as const;

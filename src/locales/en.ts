@@ -38,4 +38,5 @@ export default {
   search_form_input_shoten_word_placeholder:"上上平, etc.",
   search_form_input_kana_placeholder:"墨(Color)、Katakana",
   search_form_input_kana_word_placeholder:"Katakana",
+  search_all_form_placeholder: "Full-text search with free words",
 } as const;

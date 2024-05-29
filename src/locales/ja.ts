@@ -36,4 +36,5 @@ export default {
   search_form_input_shoten_word_placeholder:"上上平など",
   search_form_input_kana_placeholder:"墨、カタカナ",
   search_form_input_kana_word_placeholder:"カタカナ",
+  search_all_form_placeholder: "フリーワードで全文検索",
 } as const;
