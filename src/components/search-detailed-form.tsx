@@ -37,35 +37,35 @@ export default function SearchDetailedForm({
       className="flex flex-col w-full md:p-2 gap-y-4"
     >
       <p className="text-base text-base-content">
-        すべてはAND検索である。上の全文検索と併用できない。
+        {t("advanced_search_description")}
       </p>
       {/* TODO divide 漢字　漢語 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="character"
           register={register}
-          fieldLable="単字"
-          placeholder="漢字を入力"
+          fieldLable={t("search_form_character")}
+          placeholder={t("search_form_input_chinese_character")}
         />
 
         <TextInput
           label="word"
           register={register}
-          fieldLable="漢語"
-          placeholder="漢字を入力"
+          fieldLable={t("search_form_word")}
+          placeholder={t("search_form_input_chinese_character")}
         />
       </div>
 
       <div className="grid grid-cols-1">
       <label className="form-control w-full">
           <div className="label">
-            <span className="label-text">資料名</span>
+            <span className="label-text">{t("search_form_book")}</span>
           </div>
           <select
             className="select select-bordered select-info w-full"
             {...register("book_id")}
           >
-            <option value={""}>資料を選ぶ</option>
+            <option value={""}>{t("search_form_select_book")}</option>
             {bookList.map((book) => {
               return (
                 <option key={book.book_id} value={book.book_id}>
@@ -81,15 +81,15 @@ export default function SearchDetailedForm({
         <TextInput
           label="shoten"
           register={register}
-          fieldLable="声点（単字）"
-          placeholder="朱、平、濁など"
+          fieldLable={t("search_form_shoten")}
+          placeholder={t("search_form_input_shoten_placeholder")}
           className="input-info basis-1/2"
         />
         <TextInput
           label="shoten_word"
           register={register}
-          fieldLable="声点（漢語）"
-          placeholder="上上平など"
+          fieldLable={t("search_form_shoten_word")}
+          placeholder={t("search_form_input_shoten_word_placeholder")}
           className="input-info basis-1/2"
         />
       </div>
@@ -97,14 +97,14 @@ export default function SearchDetailedForm({
         <TextInput
           label="kana"
           register={register}
-          fieldLable="仮名（単字）"
-          placeholder="墨、カタカナ"
+          fieldLable={t("search_form_kana")}
+          placeholder={t("search_form_input_kana_placeholder")}
         />
         <TextInput
           label="word_kana"
           register={register}
-          fieldLable="仮名（漢語）"
-          placeholder="カタカナ"
+          fieldLable={t("search_form_kana_word")}
+          placeholder={t("search_form_input_kana_word_placeholder")}
         />
       </div>
 
@@ -112,14 +112,14 @@ export default function SearchDetailedForm({
         <TextInput
           label="fanqie"
           register={register}
-          fieldLable="反切"
-          placeholder="漢字を入力"
+          fieldLable={t("search_form_fanqie")}
+          placeholder={t("search_form_input_chinese_character")}
         />
         <TextInput
           label="ruion"
           register={register}
-          fieldLable="類音"
-          placeholder="漢字を入力"
+          fieldLable={t("search_form_ruion")}
+          placeholder={t("search_form_input_chinese_character")}
         />
       </div>
 
@@ -127,13 +127,13 @@ export default function SearchDetailedForm({
         <TextInput
           label="etc"
           register={register}
-          fieldLable="その他"
+          fieldLable={t("search_form_etc")}
           placeholder=""
         />
         <TextInput
           label="notes"
           register={register}
-          fieldLable="備考"
+          fieldLable={t("search_form_notes")}
           placeholder=""
         />
       </div>
@@ -143,7 +143,7 @@ export default function SearchDetailedForm({
           className="flex-1 btn btn-error w-full max-w-32"
           onClick={() => reset()}
         >
-          クリア
+          {t("clear")}
         </button>
         <input
           type="submit"

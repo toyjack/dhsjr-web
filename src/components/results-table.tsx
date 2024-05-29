@@ -86,7 +86,7 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                   href={`/character/${row.character_id}`}
                   className="btn btn-primary"
                 >
-                  詳細
+                  {t("details")}
                 </Link>
               </td>
             </tr>
