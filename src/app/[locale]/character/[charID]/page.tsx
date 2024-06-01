@@ -22,46 +22,46 @@ export default async function CharacterPage({
         <table className="table table-zebra">
           <thead>
             <tr>
-              <th>フィールド</th>
-              <th>値</th>
+              <th>{t("field")}</th>
+              <th>{t("value")}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th>ID</th>
+              <th>{t("character_id")}</th>
               <td>{character?.character_id}</td>
             </tr>
             <tr>
-              <th>単字_見出し</th>
+              <th>{t("character")}</th>
               <td>{character?.character}</td>
             </tr>
             <tr>
-              <th>単字_出現形</th>
+              <th>{t("character_original")}</th>
               <td>{character?.character_original}</td>
             </tr>
             <tr>
-              <th>単字長さ</th>
+              <th>{t("character_len")}</th>
               <td>{character?.len}</td>
             </tr>
             <tr>
-              <th>声点</th>
+              <th>{t("shoten")}</th>
               <td>{character?.shoten}</td>
             </tr>
             <tr>
-              <th>仮名注</th>
+              <th>{t("kanachu")}</th>
               <td>{character?.kana}</td>
             </tr>
             <tr>
-              <th>反切</th>
+              <th>{t("fanqie")}</th>
               <td>{character?.fanqie}</td>
             </tr>
             <tr>
-              <th>類音</th>
+              <th>{t("ruion")}</th>
               <td>{character?.ruion}</td>
             </tr>
             
             <tr>
-              <th>漢語_見出し</th>
+              <th>{t("word")}</th>
               <td>
                 <WordCell
                   word={character?.word!}
@@ -70,7 +70,7 @@ export default async function CharacterPage({
               </td>
             </tr>
             <tr>
-              <th>漢語_出現形</th>
+              <th>{t("word_original")}</th>
               <td>
                 <WordCell
                   word={character?.word_original!}
@@ -79,21 +79,21 @@ export default async function CharacterPage({
               </td>
             </tr>
             <tr>
-              <th>漢語_alphabet</th>
+              <th>{t("word_alphabet")}</th>
               <td>{character?.word_alphabet}</td>
             </tr>
 
             <tr>
-              <th>声点型</th>
+              <th>{t("shotengata")}</th>
               <td>{character?.shoten_word}</td>
             </tr>
             <tr>
-              <th>仮名型</th>
+              <th>{t("kanagata")}</th>
               <td>{character?.word_kana}</td>
             </tr>
 
             <tr>
-              <th>資料番号</th>
+              <th>{t("book_id")}</th>
               <td>
                 <Link
                   className="link link-hover text-info"
@@ -105,7 +105,7 @@ export default async function CharacterPage({
             </tr>
 
             <tr>
-              <th>資料名</th>
+              <th>{t("bookName")}</th>
               <td>
                 <Link
                   className="link link-hover text-info"
@@ -116,20 +116,20 @@ export default async function CharacterPage({
               </td>
             </tr>
             <tr>
-              <th>出現位置</th>
+              <th>{t("positionInBook")}</th>
               <td>{character?.position_in_book}</td>
             </tr>
             <tr>
-              <th>節博士</th>
+              <th>{t("hakase")}</th>
               <td>{character?.hakase}</td>
             </tr>
 
             <tr>
-              <th>その他</th>
+              <th>{t("etc")}</th>
               <td>{character?.etc}</td>
             </tr>
             <tr>
-              <th>備考</th>
+              <th>{t("notes")}</th>
               <td>{character?.notes}</td>
             </tr>
           </tbody>
