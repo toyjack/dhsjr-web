@@ -16,10 +16,9 @@ export default async function CharacterPage({
   const t = await getI18n();
 
   return (
-    <div className="p-2 md:p-4 lg:p-16">
-      {/* <div>CharacterPage: {params.charID}</div> */}
-      <div>
-        <table className="table table-zebra">
+    <div className="py-2 sm:py-4 lg:p-16">
+      <div className="overflow-x-auto bg-base-100 md:p-2 rounded-sm">
+        <table className="table">
           <thead>
             <tr>
               <th>{t("field")}</th>

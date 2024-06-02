@@ -9,13 +9,13 @@ export default async function SearchPanel() {
   const bookList = await getBookList();
 
   return (
-    <div className="w-full py-2 my-2 bg-base-300 md:shadow flex flex-col justify-center items-center lg:w-full">
+    <div className="w-full py-2 flex flex-col justify-center items-center lg:w-full">
       <div className="flex flex-col max-w-5xl w-full gap-y-4 px-2">
         <SearchAllForm />
 
         <div
           tabIndex={0}
-          className="collapse collapse-plus border border-base-300 bg-base-200"
+          className="collapse collapse-plus border border-base-300 bg-base-300 rounded-md"
         >
           <input type="checkbox" className="peer" />
           <div className="collapse-title text-sm md:text-xl font-medium">
