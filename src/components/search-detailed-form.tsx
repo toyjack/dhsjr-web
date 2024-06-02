@@ -7,6 +7,7 @@ import TextInput from "./text-input";
 import { useAtom } from "jotai";
 import { perPageAtom } from "@/lib/atoms";
 import { useI18n } from "@/locales/client";
+import {  KeyboardEvent } from "react";
 
 export default function SearchDetailedForm({
   bookList,
@@ -16,24 +17,33 @@ export default function SearchDetailedForm({
   const t = useI18n();
   const router = useRouter();
   const {
-    register,
-    handleSubmit,
+    register:register_advanced,
+    handleSubmit:handleSubmitAdvanced,
     reset,
     formState: { errors },
   } = useForm<Inputs>();
 
   const [perPage] = useAtom(perPageAtom);
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  const onAdvancedSubmit: SubmitHandler<Inputs> = (data) => {
     const path = `/results?${new URLSearchParams(
       data
     ).toString()}&page=1&perPage=${perPage}`;
     router.push(path);
   };
 
+  const handleKeyDown = (e:KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSubmitAdvanced((e) => onAdvancedSubmit(e))();
+    }
+  }
+
   return (
     <form
-      onSubmit={handleSubmit((e) => onSubmit(e))}
+      key={"advanced_search"}
+      onSubmit={handleSubmitAdvanced((e) => onAdvancedSubmit(e))}
+      onKeyDown={e=>handleKeyDown(e)}
       className="flex flex-col w-full md:p-2 gap-y-4"
     >
       <p className="text-base text-base-content">
@@ -43,14 +53,14 @@ export default function SearchDetailedForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="character"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_character")}
           placeholder={t("search_form_input_chinese_character")}
         />
 
         <TextInput
           label="word"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_word")}
           placeholder={t("search_form_input_chinese_character")}
         />
@@ -63,7 +73,7 @@ export default function SearchDetailedForm({
           </div>
           <select
             className="select select-bordered select-info w-full"
-            {...register("book_id")}
+            {...register_advanced("book_id")}
           >
             <option value={""}>{t("search_form_select_book")}</option>
             {bookList.map((book) => {
@@ -80,14 +90,14 @@ export default function SearchDetailedForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="shoten"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_shoten")}
           placeholder={t("search_form_input_shoten_placeholder")}
           className="input-info basis-1/2"
         />
         <TextInput
           label="shoten_word"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_shoten_word")}
           placeholder={t("search_form_input_shoten_word_placeholder")}
           className="input-info basis-1/2"
@@ -96,13 +106,13 @@ export default function SearchDetailedForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="kana"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_kana")}
           placeholder={t("search_form_input_kana_placeholder")}
         />
         <TextInput
           label="word_kana"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_kana_word")}
           placeholder={t("search_form_input_kana_word_placeholder")}
         />
@@ -111,13 +121,13 @@ export default function SearchDetailedForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="fanqie"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_fanqie")}
           placeholder={t("search_form_input_chinese_character")}
         />
         <TextInput
           label="ruion"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_ruion")}
           placeholder={t("search_form_input_chinese_character")}
         />
@@ -126,13 +136,13 @@ export default function SearchDetailedForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
           label="etc"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_etc")}
           placeholder=""
         />
         <TextInput
           label="notes"
-          register={register}
+          register={register_advanced}
           fieldLable={t("search_form_notes")}
           placeholder=""
         />
