@@ -9,3 +9,8 @@ export async function getBookData(bookId: string) {
 
   return bookContents;
 }
+
+export async function getAllBooksFileNameList() {
+  const bookFiles = fs.readdirSync(process.cwd() + "/contents/books");
+  return bookFiles.map((f) => f.replace(/\.md$/, ""));
+}

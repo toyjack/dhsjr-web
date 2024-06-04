@@ -8,21 +8,32 @@
     "start": "next start",
     "lint": "next lint",
     "studio": "prisma studio",
-    "data:update": "tsx scripts/update-data.ts"
+    "data:update": "tsx scripts/update-data.ts",
+    "data:gen-book": "tsx scripts/gen-book.ts"
   },
   "dependencies": {
     "@next/third-parties": "^14.2.3",
     "@prisma/client": "5.11.0",
     "clsx": "^2.1.0",
     "jotai": "^2.7.1",
+    "mdast-util-toc": "^7.1.0",
     "next": "14.1.3",
     "next-international": "^1.2.4",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.0",
     "react-markdown": "^9.0.1",
+    "rehype-stringify": "^10.0.0",
+    "remark": "^15.0.1",
+    "remark-html": "^16.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.0",
+    "remark-slug": "^7.0.1",
+    "remark-toc": "^9.0.0",
     "tailwind-merge": "^2.2.1",
-    "tify": "^0.30.2"
+    "tify": "^0.30.2",
+    "unified": "^11.0.4",
+    "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
