@@ -2,6 +2,11 @@ import { getBookData } from "@/lib/books";
 import ReactMarkdown from "react-markdown";
 import { ALL_MANIFEST } from "../../../../../contents/manifest";
 import IiifViewer from "@/components/iiif-viewer";
+import dynamic from "next/dynamic";
+
+const DynamicIIIFViewer = dynamic(() => import("@/components/iiif-viewer"), {
+  ssr: false,
+});
 
 export default async function BookPage({
   params,
@@ -22,7 +27,7 @@ export default async function BookPage({
       </div>
 
       <div>
-        {manifest ? <IiifViewer manifestUrl={manifest} /> : "No manifest"}
+        {manifest ? <DynamicIIIFViewer manifestUrl={manifest} /> : "No manifest"}
       </div>
     </div>
   );
