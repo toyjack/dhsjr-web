@@ -1,6 +1,6 @@
 "use client";
 
-import { Dhsjr } from "@prisma/client";
+import type { Dhsjr } from "@prisma/client";
 import RubyCell from "./ruby-cell";
 import Link from "next/link";
 import { useI18n } from "@/locales/client";
@@ -34,7 +34,7 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                 rubyBottom={t("kanagata")}
               />
             </th>
-            <th></th>
+            <th> </th>
           </tr>
         </thead>
         <tbody>
@@ -58,7 +58,9 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                       {row.book_name}
                     </Link>
                   </div>
-                  <div>{t("shozai")}：{row.position_in_book}</div>
+                  <div>
+                    {t("shozai")}：{row.position_in_book}
+                  </div>
                 </div>
               </td>
               <td className="text-base-content text-2xl font-semibold">
@@ -74,15 +76,15 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
               <td className="text-2xl">
                 {/* TODO word's id  */}
                 {/* <Link href={`/word/${row.book_id}-${row.word_index_in_book}`}> */}
-                  <RubyCell
-                    baseText={row.word}
-                    rubyTop={row.shoten_word}
-                    rubyBottom={row.word_kana}
-                  />
+                <RubyCell
+                  baseText={row.word}
+                  rubyTop={row.shoten_word}
+                  rubyBottom={row.word_kana}
+                />
                 {/* </Link> */}
               </td>
               <td>
-              <Link
+                <Link
                   href={`/character/${row.character_id}`}
                   className="btn btn-primary"
                 >

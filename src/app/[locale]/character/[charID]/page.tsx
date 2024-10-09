@@ -8,11 +8,18 @@ export default async function CharacterPage({
 }: {
   params: { charID: string };
 }) {
+  // TODO: move to db
   const character = await prisma.dhsjr.findUnique({
     where: {
       character_id: params.charID,
     },
   });
+
+  if (!character) {
+    // TODO: add i18n
+    return <div>Character not found</div>;
+  }
+
   const t = await getI18n();
 
   return (
@@ -58,13 +65,13 @@ export default async function CharacterPage({
               <th>{t("ruion")}</th>
               <td>{character?.ruion}</td>
             </tr>
-            
+
             <tr>
               <th>{t("word")}</th>
               <td>
                 <WordCell
-                  word={character?.word!}
-                  position={character?.pos_in_word!}
+                  word={character?.word ?? undefined}
+                  position={character?.pos_in_word ?? undefined}
                 />
               </td>
             </tr>
@@ -72,8 +79,8 @@ export default async function CharacterPage({
               <th>{t("word_original")}</th>
               <td>
                 <WordCell
-                  word={character?.word_original!}
-                  position={character?.pos_in_word!}
+                  word={character?.word_original ?? undefined}
+                  position={character?.pos_in_word ?? undefined}
                 />
               </td>
             </tr>

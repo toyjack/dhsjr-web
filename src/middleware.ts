@@ -1,6 +1,5 @@
-// middleware.ts
 import { createI18nMiddleware } from "next-international/middleware";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 const I18nMiddleware = createI18nMiddleware({
   locales: ["ja", "en", "zh"],

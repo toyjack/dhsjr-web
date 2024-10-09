@@ -20,8 +20,13 @@ export default function RubyCell({
 
   const BaseText = ({ baseText }: { baseText: string }) => {
     if (href) {
-      return <Link className="link link-hover" href={href}>{baseText}</Link>;
-    } else return <>{baseText}</>;
+      return (
+        <Link className="link link-hover" href={href}>
+          {baseText}
+        </Link>
+      );
+    }
+    return <>{baseText}</>;
   };
 
   return (

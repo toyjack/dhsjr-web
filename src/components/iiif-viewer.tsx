@@ -15,7 +15,7 @@ export default function IiifViewer({ manifestUrl }: { manifestUrl: string }) {
 
   return (
     <div>
-      <div className="divider"></div>
+      <div className="divider" />
       <div id="tify" style={{ height: "640px" }}>
         IIIF Viewer
       </div>

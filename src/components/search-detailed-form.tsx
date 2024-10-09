@@ -1,13 +1,13 @@
 "use client";
 
-import { BookList, Inputs } from "@/types";
+import type { BookList, Inputs } from "@/types";
 import { useRouter } from "next/navigation";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import TextInput from "./text-input";
 import { useAtom } from "jotai";
 import { perPageAtom } from "@/lib/atoms";
 import { useI18n } from "@/locales/client";
-import {  KeyboardEvent } from "react";
+import type { KeyboardEvent } from "react";
 
 export default function SearchDetailedForm({
   bookList,
@@ -17,8 +17,8 @@ export default function SearchDetailedForm({
   const t = useI18n();
   const router = useRouter();
   const {
-    register:register_advanced,
-    handleSubmit:handleSubmitAdvanced,
+    register: register_advanced,
+    handleSubmit: handleSubmitAdvanced,
     reset,
     formState: { errors },
   } = useForm<Inputs>();
@@ -32,18 +32,18 @@ export default function SearchDetailedForm({
     router.push(path);
   };
 
-  const handleKeyDown = (e:KeyboardEvent<HTMLFormElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLFormElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSubmitAdvanced((e) => onAdvancedSubmit(e))();
     }
-  }
+  };
 
   return (
     <form
       key={"advanced_search"}
       onSubmit={handleSubmitAdvanced((e) => onAdvancedSubmit(e))}
-      onKeyDown={e=>handleKeyDown(e)}
+      onKeyDown={(e) => handleKeyDown(e)}
       className="flex flex-col w-full md:p-2 gap-y-4"
     >
       <p className="text-base text-base-content">
@@ -67,7 +67,7 @@ export default function SearchDetailedForm({
       </div>
 
       <div className="grid grid-cols-1">
-      <label className="form-control w-full">
+        <label className="form-control w-full">
           <div className="label">
             <span className="label-text">{t("search_form_book")}</span>
           </div>
@@ -79,7 +79,7 @@ export default function SearchDetailedForm({
             {bookList.map((book) => {
               return (
                 <option key={book.book_id} value={book.book_id}>
-                  {book.book_id}{" "}{book.book_name}
+                  {book.book_id} {book.book_name}
                 </option>
               );
             })}
@@ -150,6 +150,7 @@ export default function SearchDetailedForm({
 
       <div className="flex flex-row w-full gap-x-4 pb-2 items-end justify-end">
         <button
+          type="button"
           className="flex-1 btn btn-error w-full max-w-32"
           onClick={() => reset()}
         >

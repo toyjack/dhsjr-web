@@ -16,7 +16,7 @@ export default function PaginationPanel({ maxPage }: { maxPage: number }) {
     newSearchParams.set("page", String(page));
     const newUrl = `${path}?${newSearchParams.toString()}`;
     // console.log(newUrl);
-    route.push(newUrl)
+    route.push(newUrl);
   };
 
   const onClickNext = () => {
@@ -42,12 +42,13 @@ export default function PaginationPanel({ maxPage }: { maxPage: number }) {
   return (
     <div className="join">
       <button
+        type="button"
         className="join-item btn btn-info btn-outline"
         onClick={onClickPrev}
       >
         «
       </button>
-      {/* <button className={cn('join-item btn btn-info btn-outline',{'btn-active':currentPage===1})} onClick={onClickFirst}>1</button> */}
+      
       <select
         className="join-item select select-bordered select-info"
         value={currentPage}
@@ -58,10 +59,10 @@ export default function PaginationPanel({ maxPage }: { maxPage: number }) {
             {page} / {maxPage}
           </option>
         ))}
-        {/* <option value="1" selected={currentPage===1}>1 / {maxPage}</option> */}
       </select>
-      {/* <button className={cn('join-item btn btn-info btn-outline',{'btn-active':currentPage===maxPage})} onClick={onClickLast}>{maxPage}</button> */}
+
       <button
+        type="button"
         className="join-item btn btn-info btn-outline"
         onClick={onClickNext}
       >

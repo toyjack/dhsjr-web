@@ -1,7 +1,7 @@
-import fs from "fs";
+import fs from "node:fs";
 
 export async function getBookData(bookId: string) {
-  const filename = process.cwd() + "/contents/books/" + bookId + ".md";
+  const filename = `${process.cwd()}/contents/books/${bookId}.md`;
   if (!fs.existsSync(filename)) {
     return null;
   }
@@ -11,6 +11,6 @@ export async function getBookData(bookId: string) {
 }
 
 export async function getAllBooksFileNameList() {
-  const bookFiles = fs.readdirSync(process.cwd() + "/contents/books");
+  const bookFiles = fs.readdirSync(`${process.cwd()}/contents/books`);
   return bookFiles.map((f) => f.replace(/\.md$/, ""));
 }

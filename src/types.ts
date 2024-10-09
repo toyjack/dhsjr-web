@@ -1,3 +1,5 @@
+import type { Dhsjr } from "@prisma/client";
+
 export type Inputs = {
   character: string;
   word_original: string;
@@ -23,3 +25,16 @@ export type BookList={
   book_id: string;
   book_name: string;
 }[]
+
+export type SearchResults = {
+  meta: {
+    query: { 
+      term?:string,
+      params?:Inputs
+     },
+    count: number,
+    page: number,
+    perPage: number,
+  },
+  data: Dhsjr[],
+}

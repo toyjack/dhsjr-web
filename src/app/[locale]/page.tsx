@@ -43,7 +43,7 @@ export default function Home() {
         </p>
       </article>
 
-      <div className="divider"></div>
+      <div className="divider" />
 
       <article className="prose max-w-none">
         <h2>資料横断的な漢字音・漢語音データベース</h2>

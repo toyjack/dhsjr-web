@@ -3,7 +3,7 @@ import PerPageSetting from "@/components/per-page-setting";
 import ResultsTable from "@/components/results-table";
 import { search, searchAll } from "@/lib/db";
 import { getI18n } from "@/locales/server";
-import { Inputs } from "@/types";
+import type { Inputs, SearchResults } from "@/types";
 
 export default async function ResultPage({
   searchParams,
@@ -16,7 +16,7 @@ export default async function ResultPage({
     return <div>検索条件が指定されていません。</div>;
   }
 
-  let data;
+  let data: SearchResults;
   if (searchParams.query) {
     data = await searchAll(
       searchParams.query as string,

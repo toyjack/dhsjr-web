@@ -1,7 +1,6 @@
 import { getBookData } from "@/lib/books";
 import ReactMarkdown from "react-markdown";
 import { ALL_MANIFEST } from "../../../../../contents/manifest";
-import IiifViewer from "@/components/iiif-viewer";
 import dynamic from "next/dynamic";
 
 const DynamicIIIFViewer = dynamic(() => import("@/components/iiif-viewer"), {
@@ -14,9 +13,12 @@ export default async function BookPage({
   params: { bookID: string };
 }) {
   const bookData = await getBookData(params.bookID);
-  const manifest = ALL_MANIFEST.find((m) => m.book_id === params.bookID)?.manifest;
+  const manifest = ALL_MANIFEST.find(
+    (m) => m.book_id === params.bookID
+  )?.manifest;
 
   if (!bookData) {
+    // TODO: add i18n
     return <div>Book not found</div>;
   }
 
@@ -27,7 +29,12 @@ export default async function BookPage({
       </div>
 
       <div>
-        {manifest ? <DynamicIIIFViewer manifestUrl={manifest} /> : "No manifest"}
+        {manifest ? (
+          <DynamicIIIFViewer manifestUrl={manifest} />
+        ) : (
+          // TODO: add i18n
+          "No manifest"
+        )}
       </div>
     </div>
   );

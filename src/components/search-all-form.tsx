@@ -4,7 +4,7 @@ import { perPageAtom } from "@/lib/atoms";
 import { useI18n } from "@/locales/client";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 
 type Inputs = {
   query: string;

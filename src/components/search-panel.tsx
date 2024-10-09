@@ -14,6 +14,7 @@ export default async function SearchPanel() {
         <SearchAllForm />
 
         <div
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: <explanation>
           tabIndex={0}
           className="collapse collapse-plus border border-base-300 bg-base-300 rounded-md"
         >

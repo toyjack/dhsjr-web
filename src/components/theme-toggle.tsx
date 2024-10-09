@@ -3,7 +3,7 @@
 import { themeAtom } from "@/lib/atoms";
 import { cn } from "@/lib/utils";
 import { useAtom } from "jotai";
-import { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 
 export default function ThemeToggle() {
   const SunIcon = ({ className }: { className?: string }) => (
@@ -15,6 +15,7 @@ export default function ThemeToggle() {
       stroke="currentColor"
       className={cn("w-6 h-6", className)}
     >
+      <title>SunIcon</title>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -32,6 +33,7 @@ export default function ThemeToggle() {
       stroke="currentColor"
       className={cn("w-6 h-6", className)}
     >
+      <title>MoonIcon</title>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -56,7 +58,7 @@ export default function ThemeToggle() {
     <label className="swap">
       <input
         type="checkbox"
-        checked={theme==="light"}
+        checked={theme === "light"}
         onChange={(e) => toggleTheme(e)}
       />
       <SunIcon className="swap-on" />

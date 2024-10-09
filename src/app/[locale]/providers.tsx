@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Provider as JotaiProvider } from "jotai";
 import ThemeProvider from "@/components/theme-provider";
 import { I18nProviderClient } from "@/locales/client";

@@ -21,23 +21,20 @@ export default function PerPageSetting() {
     newSearchParams.set("perPage", e.target.value);
     newSearchParams.set("page", "1");
     const newUrl = `${pathname}?${newSearchParams.toString()}`;
-    // console.log(newUrl)
     route.push(newUrl);
   };
 
   return (
-    <>
-      <select
-        className="select select-bordered select-info w-full max-w-xs"
-        value={perPage}
-        onChange={(e) => handleChange(e)}
-      >
-        {perPageOptions.map((option) => (
-          <option key={option} value={option} disabled={option === perPage}>
-            {t("perPage", { count: option })}
-          </option>
-        ))}
-      </select>
-    </>
+    <select
+      className="select select-bordered select-info w-full max-w-xs"
+      value={perPage}
+      onChange={(e) => handleChange(e)}
+    >
+      {perPageOptions.map((option) => (
+        <option key={option} value={option} disabled={option === perPage}>
+          {t("perPage", { count: option })}
+        </option>
+      ))}
+    </select>
   );
 }
