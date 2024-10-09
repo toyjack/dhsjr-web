@@ -1,7 +1,8 @@
 export const ALL_MANIFEST = [
   {
     book_id: "20-002-01",
-    manifest: "https://emuseum.nich.go.jp/iiifapi/100173035000/manifest.json",
+    // manifest: "https://emuseum.nich.go.jp/iiifapi/100173035000/manifest.json",
+    manifest: "https://emuseum.nich.go.jp/iiifapi/100173002/manifest.json",
   },
   {
     book_id: "20-002-02",
