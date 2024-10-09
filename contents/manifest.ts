@@ -4,6 +4,10 @@ export const ALL_MANIFEST = [
     manifest: "https://emuseum.nich.go.jp/iiifapi/100173035000/manifest.json",
   },
   {
+    book_id: "20-002-02",
+    manifest: "https://dl.ndl.go.jp/api/iiif/1145636/manifest.json",
+  },
+  {
     book_id: "20-044-01",
     manifest: "https://dl.ndl.go.jp/api/iiif/1116593/manifest.json",
   },
