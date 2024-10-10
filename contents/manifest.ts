@@ -18,8 +18,21 @@ export const ALL_MANIFEST = [
       "https://db2.sido.keio.ac.jp/iiif/manifests/kanseki/069336/069336-001/manifest.json",
   },
   {
+    book_id: "30-013-01",
+    manifest:
+      "https://iiif.archive.waseda.jp/iiif/manifest/ktnsk/bunko12_00001/manifest.json",
+  },
+  {
     book_id: "30-017-01",
     manifest: "https://dl.ndl.go.jp/api/iiif/1885583/manifest.json",
+  },
+  {
+    book_id: "30-026-03",
+    manifest: "https://kokusho.nijl.ac.jp/biblio/100309444/manifest",
+  },
+  {
+    book_id: "30-026-04",
+    manifest: "https://kokusho.nijl.ac.jp/biblio/100067770/manifest",
   },
   {
     book_id: "30-038-02",

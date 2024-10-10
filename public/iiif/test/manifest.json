@@ -1,0 +1,28 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "sc:Manifest",
+  "@id": "https://dl.ndl.go.jp/api/iiif/2543275/manifest.json",
+  "label": "尾張国郡司百姓等解文",
+  "metadata": [
+    {
+      "label": "Title",
+      "value": "尾張国郡司百姓等解文"
+    },
+    {
+      "label": "Publication Date",
+      "value": "永延2年11月8日(988年)"
+    },
+    {
+      "label": "URL",
+      "value": "https://www.wul.waseda.ac.jp/kosho/bunko12/b12_0001/index.html"
+    }
+  ],
+  "license": "https://www.waseda.jp/library/user/using-images/",
+  "attribution": "早稲田大学図書館",
+  "sequences": [
+    {
+      "@type": "sc:Sequence",
+      "viewHint": "individuals"
+    }
+  ]
+}

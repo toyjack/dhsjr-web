@@ -27,6 +27,8 @@
     "tify": "^0.30.2"
   },
   "devDependencies": {
+    "@blueprintjs/core": "^5.13.1",
+    "@blueprintjs/icons": "^5.13.0",
     "@tailwindcss/typography": "^0.5.10",
     "@types/node": "^20",
     "@types/papaparse": "^5.3.14",

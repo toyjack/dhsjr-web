@@ -3,8 +3,12 @@
 import { useState } from "react";
 import TifyViewer from "./tify-viewer";
 import { cn } from "@/lib/utils";
-import MiradorViewer from "./mirador-viewer";
 import UvViewer from "./uv-viewer";
+import dynamic from "next/dynamic";
+
+const MiradorViewer = dynamic(() => import("@/components/mirador-js"), {
+  ssr: false,
+});
 
 export default function IiifViewer({ manifestUrl }: { manifestUrl: string }) {
   const [activeTab, setActiveTab] = useState("tify");
@@ -12,13 +16,25 @@ export default function IiifViewer({ manifestUrl }: { manifestUrl: string }) {
   return (
     <div>
       <div role="tablist" className="tabs tabs-boxed">
-        <a role="tab" className={cn("tab",activeTab==="tify"?"tab-active":"")} onClick={()=>setActiveTab("tify")}>
+        <a
+          role="tab"
+          className={cn("tab", activeTab === "tify" ? "tab-active" : "")}
+          onClick={() => setActiveTab("tify")}
+        >
           Viewer: TIFY
         </a>
-        <a role="tab" className={cn("tab",activeTab==="mirador"?"tab-active":"")} onClick={()=>setActiveTab("mirador")}>
+        <a
+          role="tab"
+          className={cn("tab", activeTab === "mirador" ? "tab-active" : "")}
+          onClick={() => setActiveTab("mirador")}
+        >
           Viewer: Mirador
         </a>
-        <a role="tab" className={cn("tab",activeTab==="uv"?"tab-active":"")} onClick={()=>setActiveTab("uv")}>
+        <a
+          role="tab"
+          className={cn("tab", activeTab === "uv" ? "tab-active" : "")}
+          onClick={() => setActiveTab("uv")}
+        >
           Viewer: Universal Viewer
         </a>
       </div>
