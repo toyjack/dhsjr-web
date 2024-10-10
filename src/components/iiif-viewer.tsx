@@ -5,6 +5,7 @@ import TifyViewer from "./tify-viewer";
 import { cn } from "@/lib/utils";
 import UvViewer from "./uv-viewer";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 const MiradorViewer = dynamic(() => import("@/components/mirador-js"), {
   ssr: false,
@@ -14,7 +15,11 @@ export default function IiifViewer({ manifestUrl }: { manifestUrl: string }) {
   const [activeTab, setActiveTab] = useState("tify");
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
+      <div>
+        <h2>IIIF Viewer</h2>
+        <p>Manifest URL: <Link className="link link-hover" href={manifestUrl} target="_blank">{manifestUrl}</Link></p>
+      </div>
       <div role="tablist" className="tabs tabs-boxed">
         <a
           role="tab"
