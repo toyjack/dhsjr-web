@@ -1,8 +1,8 @@
 "use client";
 
-import Script from 'next/script'
 import React, { useEffect, useRef } from 'react'
-import Mirador from 'mirador/dist/es/src/index';
+// @ts-ignore
+const  Mirador =require('mirador/dist/es/src/index');
 
 export default function MiradorViewer({manifestUrl}: {manifestUrl: string}) {
   // bugging
