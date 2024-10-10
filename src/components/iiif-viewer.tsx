@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useAtom } from "jotai";
 import { currentIFFFViewerAtom } from "@/lib/atoms";
+import CloverViewer from "./clover-viewer";
 
 const MiradorViewer = dynamic(() => import("@/components/mirador-js"), {
   ssr: false,
@@ -52,6 +53,15 @@ export default function IiifViewer({ manifestUrl }: { manifestUrl: string }) {
         >
           Viewer: Universal Viewer
         </a>
+
+        <a
+          role="tab"
+          className={cn("tab", currentViewer === "clover" ? "tab-active" : "")}
+          // biome-ignore lint/a11y/useValidAnchor: <explanation>
+          onClick={() => setCurrentViewer("clover")}
+        >
+          Viewer: CloverIIIF
+        </a>
       </div>
 
       <div>
@@ -60,6 +70,7 @@ export default function IiifViewer({ manifestUrl }: { manifestUrl: string }) {
           <MiradorViewer manifestUrl={manifestUrl} />
         )}
         {currentViewer === "uv" && <UvViewer manifestUrl={manifestUrl} />}
+        {currentViewer === "clover" && <CloverViewer manifestUrl={manifestUrl} />}
       </div>
     </div>
   );
