@@ -48,4 +48,11 @@ export default {
   etc:"其他",
   notes:"备考",
   character_id:"单字ID",
+  show_all_records_of_this_book:"显示此资料的所有记录",
+  character_not_found:"未找到单字",
+  all_books_list:"文献资料一览",
+  book_name:"文献名称",
+  iiif_availability:"IIIF可用性",
+  book_not_found:"未找到文献",
+  no_iiif_manifest:"没有IIIF清单",
 } as const;

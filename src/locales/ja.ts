@@ -48,4 +48,11 @@ export default {
   etc:"その他",
   notes:"備考",
   character_id:"単字ID",
+  show_all_records_of_this_book:"この資料の全レコードを表示",
+  character_not_found:"単字が見つかりません",
+  all_books_list:"文献資料一覧",
+  book_name:"文献名",
+  iiif_availability:"IIIF利用可能",
+  book_not_found:"文献が見つかりません",
+  no_iiif_manifest:"IIIFマニフェストがありません",
 } as const;

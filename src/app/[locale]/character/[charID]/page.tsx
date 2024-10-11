@@ -8,6 +8,8 @@ export default async function CharacterPage({
 }: {
   params: { charID: string };
 }) {
+  const t = await getI18n();
+
   // TODO: move to db
   const character = await prisma.dhsjr.findUnique({
     where: {
@@ -16,11 +18,8 @@ export default async function CharacterPage({
   });
 
   if (!character) {
-    // TODO: add i18n
-    return <div>Character not found</div>;
+    return <div>{t("character_not_found")}</div>;
   }
-
-  const t = await getI18n();
 
   return (
     <div className="py-2 sm:py-4 lg:p-16">

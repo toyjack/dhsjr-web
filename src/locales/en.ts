@@ -50,4 +50,11 @@ export default {
   etc:"etc.",
   notes:"Notes",
   character_id:"Character ID",
+  show_all_records_of_this_book:"Show all records of this book",
+  character_not_found:"Character not found",
+  all_books_list:"List of all books",
+  book_name:"Book Name",
+  iiif_availability:"IIIF Availability",
+  book_not_found:"Book not found",
+  no_iiif_manifest:"No IIIF Manifest",
 } as const;
