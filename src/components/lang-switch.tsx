@@ -1,12 +1,10 @@
 "use client";
 
 import { useChangeLocale, useCurrentLocale } from "@/locales/client";
-import { TbLanguageHiragana } from "react-icons/tb";
+import { IoLanguageOutline } from "react-icons/io5";
 
 export default function LangSwitch() {
-  const SwitchIcon = () => (
-    <TbLanguageHiragana className="text-2xl" />
-  );
+  const SwitchIcon = () => <IoLanguageOutline className="text-2xl" />;
 
   const changeLocale = useChangeLocale({ preserveSearchParams: true });
   const locale = useCurrentLocale();

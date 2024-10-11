@@ -3,6 +3,7 @@ import ThemeToggle from "./theme-toggle";
 import LangSwitch from "./lang-switch";
 import Link from "next/link";
 import { getI18n } from "@/locales/server";
+import { IoBookOutline } from "react-icons/io5";
 
 export default async function Header() {
   const t = await getI18n();
@@ -15,6 +16,11 @@ export default async function Header() {
         </Link>
       </div>
       <div className="flex-none gap-2">
+        <div>
+          <Link href={"/books"} className="btn btn-ghost">
+            <IoBookOutline className="text-2xl" /> 文献一覧
+          </Link>
+        </div>
         <ThemeToggle />
         <LangSwitch />
       </div>
