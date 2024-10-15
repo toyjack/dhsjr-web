@@ -2,6 +2,8 @@ import WordCell from "@/components/word-cell";
 import { prisma } from "@/lib/prisma";
 import { getI18n } from "@/locales/server";
 import Link from "next/link";
+import { ALL_MANIFEST } from "../../../../../contents/manifest";
+import { IoImagesOutline } from "react-icons/io5";
 
 export default async function CharacterPage({
   params,
@@ -20,6 +22,10 @@ export default async function CharacterPage({
   if (!character) {
     return <div>{t("character_not_found")}</div>;
   }
+
+  const manifest = ALL_MANIFEST.find(
+    (m) => m.book_id === character.book_id
+  )?.manifest;
 
   return (
     <div className="py-2 sm:py-4 lg:p-16">
@@ -101,10 +107,11 @@ export default async function CharacterPage({
               <th>{t("book_id")}</th>
               <td>
                 <Link
-                  className="link link-hover text-info"
+                  className="link link-hover text-info flex gap-1"
                   href={`/book/${character?.book_id}`}
                 >
                   {character?.book_id}
+                  {manifest && <IoImagesOutline className="text-base" />}
                 </Link>
               </td>
             </tr>
@@ -113,10 +120,11 @@ export default async function CharacterPage({
               <th>{t("bookName")}</th>
               <td>
                 <Link
-                  className="link link-hover text-info"
+                  className="link link-hover text-info flex gap-1"
                   href={`/book/${character?.book_id}`}
                 >
                   {character?.book_name}
+                  {manifest && <IoImagesOutline className="text-base" />}
                 </Link>
               </td>
             </tr>
