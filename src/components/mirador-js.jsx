@@ -2,8 +2,9 @@ import { useEffect, useMemo } from "react";
 import mirador from "mirador";
 import { useCurrentLocale } from "@/locales/client";
 
-const MiradorViewer = ({ manifestUrl }) => {
+const MiradorViewer = ({ manifestUrl, iiifPage }) => {
   const currentLocale = useCurrentLocale();
+  const iiifIndex = iiifPage - 1;
 
   const config = useMemo(
     () => ({
@@ -12,6 +13,7 @@ const MiradorViewer = ({ manifestUrl }) => {
       windows: [
         {
           loadedManifest: manifestUrl,
+          canvasIndex: iiifIndex,
         },
       ],
       window: {
@@ -27,7 +29,7 @@ const MiradorViewer = ({ manifestUrl }) => {
         enabled: false,
       },
     }),
-    [manifestUrl, currentLocale]
+    [manifestUrl, currentLocale, iiifIndex]
   );
 
   useEffect(() => {

@@ -13,7 +13,7 @@ const MiradorViewer = dynamic(() => import("@/components/mirador-js"), {
   ssr: false,
 });
 
-export default function IiifViewer({ manifestUrl }: { manifestUrl: string }) {
+export default function IiifViewer({ manifestUrl, iiifPage=1 }: { manifestUrl: string, iiifPage?: number }) {
   const [currentViewer, setCurrentViewer] = useAtom(currentIFFFViewerAtom);
 
   return (
@@ -26,6 +26,7 @@ export default function IiifViewer({ manifestUrl }: { manifestUrl: string }) {
             {manifestUrl}
           </Link>
         </p>
+        <p>Page: {iiifPage}</p>
       </div>
 
       <div role="tablist" className="tabs tabs-boxed">
@@ -65,11 +66,11 @@ export default function IiifViewer({ manifestUrl }: { manifestUrl: string }) {
       </div>
 
       <div>
-        {currentViewer === "tify" && <TifyViewer manifestUrl={manifestUrl} />}
+        {currentViewer === "tify" && <TifyViewer manifestUrl={manifestUrl} iiifPage={iiifPage} />}
         {currentViewer === "mirador" && (
-          <MiradorViewer manifestUrl={manifestUrl} />
+          <MiradorViewer manifestUrl={manifestUrl} iiifPage={iiifPage} />
         )}
-        {currentViewer === "uv" && <UvViewer manifestUrl={manifestUrl} />}
+        {currentViewer === "uv" && <UvViewer manifestUrl={manifestUrl} iiifPage={iiifPage} />}
         {currentViewer === "clover" && <CloverViewer manifestUrl={manifestUrl} />}
       </div>
     </div>

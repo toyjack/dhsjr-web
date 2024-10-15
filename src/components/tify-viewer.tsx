@@ -5,8 +5,9 @@ import "tify/dist/tify.css";
 import "tify";
 import { useEffect } from "react";
 import { useCurrentLocale } from "@/locales/client";
+import { pages } from "next/dist/build/templates/app-page";
 
-export default function TifyViewer({ manifestUrl }: { manifestUrl: string }) {
+export default function TifyViewer({ manifestUrl, iiifPage }: { manifestUrl: string, iiifPage: number }) {
   const currentLocale = useCurrentLocale();
 
   useEffect(() => {
@@ -15,7 +16,8 @@ export default function TifyViewer({ manifestUrl }: { manifestUrl: string }) {
       container: "#tify",
       manifestUrl,
       language: currentLocale,
-      translationsDirUrl:"/iiif/tify/locales"
+      translationsDirUrl:"/iiif/tify/locales",
+      pages:[iiifPage],
     });
 
     return () => {

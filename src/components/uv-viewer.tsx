@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 
-export default function UvViewer({ manifestUrl }: { manifestUrl: string }) {
+export default function UvViewer({ manifestUrl, iiifPage }: { manifestUrl: string, iiifPage: number }) {
   return (
     <div>
       <div id="uv" className="uv" />
@@ -12,6 +12,7 @@ export default function UvViewer({ manifestUrl }: { manifestUrl: string }) {
         onLoad={() => {
           const data = {
             manifest: manifestUrl,
+            canvasIndex: iiifPage-1,
           };
           // @ts-ignore
           const uv = UV.init("uv", data);
