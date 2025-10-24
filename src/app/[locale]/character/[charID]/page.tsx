@@ -5,11 +5,12 @@ import Link from "next/link";
 import { ALL_MANIFEST } from "../../../../../contents/manifest";
 import { IoImagesOutline } from "react-icons/io5";
 
-export default async function CharacterPage({
-  params,
-}: {
-  params: { charID: string };
-}) {
+export default async function CharacterPage(
+  props: {
+    params: Promise<{ charID: string }>;
+  }
+) {
+  const params = await props.params;
   const t = await getI18n();
 
   // TODO: move to db

@@ -5,11 +5,12 @@ import { search, searchAll } from "@/lib/db";
 import { getI18n } from "@/locales/server";
 import type { Inputs, SearchResults } from "@/types";
 
-export default async function ResultPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function ResultPage(
+  props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   // TODO check if string in searchParams is empty
   if (!searchParams) {
     // add i18n

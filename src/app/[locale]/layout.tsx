@@ -16,13 +16,18 @@ export const metadata: Metadata = {
     "本データベース（略称：DHSJR）は、平安・鎌倉期～現代までの文献資料に現われる漢字音・漢語音を、字音注記（仮名注、声点、反切、類音注、節博士等）に即して検索可能とするものです。",
 };
 
-export default function RootLayout({
-  params,
-  children,
-}: {
-  params: { locale: string };
-  children: React.ReactNode;
-}) {
+export default async function RootLayout(
+  props: {
+    params: Promise<{ locale: string }>;
+    children: React.ReactNode;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   return (
     <html lang="ja">
       <body>

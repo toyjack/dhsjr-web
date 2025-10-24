@@ -5,15 +5,14 @@ import dynamic from "next/dynamic";
 import SearcWordInBookBtn from "@/components/search-word-in-book-btn";
 import { getI18n } from "@/locales/server";
 
-const DynamicIIIFViewer = dynamic(() => import("@/components/iiif-viewer"), {
-  ssr: false,
-});
+const DynamicIIIFViewer = dynamic(() => import("@/components/iiif-viewer"));
 
-export default async function BookPage({
-  params,
-}: {
-  params: { bookID: string };
-}) {
+export default async function BookPage(
+  props: {
+    params: Promise<{ bookID: string }>;
+  }
+) {
+  const params = await props.params;
   const t = await getI18n();
   const bookData = await getBookData(params.bookID);
   const manifest = ALL_MANIFEST.find(

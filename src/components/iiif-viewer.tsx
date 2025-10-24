@@ -7,7 +7,6 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useAtom } from "jotai";
 import { currentIFFFViewerAtom } from "@/lib/atoms";
-import CloverViewer from "./clover-viewer";
 
 const MiradorViewer = dynamic(() => import("@/components/mirador-js"), {
   ssr: false,
@@ -71,7 +70,6 @@ export default function IiifViewer({ manifestUrl, iiifPage=1 }: { manifestUrl: s
           <MiradorViewer manifestUrl={manifestUrl} iiifPage={iiifPage} />
         )}
         {currentViewer === "uv" && <UvViewer manifestUrl={manifestUrl} iiifPage={iiifPage} />}
-        {currentViewer === "clover" && <CloverViewer manifestUrl={manifestUrl} />}
       </div>
     </div>
   );
