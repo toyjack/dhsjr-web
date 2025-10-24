@@ -49,18 +49,18 @@ export default async function BookPage(
 
         <h3>{t("guides")}</h3>
         {bookData.guide.map((g, index) => (
-          <p key={index}>{g}</p>
+          <p key={`guide-${index}-${g}`}>{g}</p>
         ))}
         <div className="divider" />
 
         <h3>{t("informations")}</h3>
         {bookData.information.map((info, index) => (
-          <p key={index}>{info}</p>
+          <p key={`info-${index}-${info}`}>{info}</p>
         ))}
         <div className="divider" />
         <h3>{t("bibs")}</h3>
         {bookData.bibs.map((bib, index) => (
-          <p key={index}>{bib}</p>
+          <p key={`bib-${index}-${bib}`}>{bib}</p>
         ))}
         
       </div>

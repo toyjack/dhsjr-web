@@ -53,15 +53,6 @@ export default function IiifViewer({ manifestUrl, iiifPage=1 }: { manifestUrl: s
         >
           Viewer: Universal Viewer
         </a>
-
-        <a
-          role="tab"
-          className={cn("tab", currentViewer === "clover" ? "tab-active" : "")}
-          // biome-ignore lint/a11y/useValidAnchor: <explanation>
-          onClick={() => setCurrentViewer("clover")}
-        >
-          Viewer: CloverIIIF
-        </a>
       </div>
 
       <div>

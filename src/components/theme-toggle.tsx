@@ -5,9 +5,7 @@ import { cn } from "@/lib/utils";
 import { useAtom } from "jotai";
 import type { ChangeEvent } from "react";
 import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
-
-export default function ThemeToggle() {
-  const SunIcon = ({ className }: { className?: string }) => (
+const SunIcon = ({ className }: { className?: string }) => (
     <IoSunnyOutline className={cn(["text-2xl",className])} />
   );
 
@@ -15,6 +13,8 @@ export default function ThemeToggle() {
     <IoMoonOutline className={cn(["text-2xl",className])} />
   );
 
+export default function ThemeToggle() {
+  
   const [theme, setTheme] = useAtom(themeAtom);
 
   const toggleTheme = (e: ChangeEvent<HTMLInputElement>) => {

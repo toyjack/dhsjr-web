@@ -1,8 +1,6 @@
 import Link from "next/link";
 import React from "react";
-
-export default function Footer() {
-  const FileIcon = () => (
+const FileIcon = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -35,6 +33,9 @@ export default function Footer() {
       />
     </svg>
   );
+  
+export default function Footer() {
+  
   return (
     <footer className="footer p-10 bg-base-300 text-base-content">
       <aside>

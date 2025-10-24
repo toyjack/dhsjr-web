@@ -13,11 +13,11 @@
   },
   "dependencies": {
     "@next/third-parties": "16.0.0",
-    "@prisma/client": "5.11.0",
+    "@prisma/client": "^6.18.0",
     "clsx": "^2.1.0",
     "jotai": "^2.7.1",
     "mirador": "4.0.0-alpha.2",
-    "next": "16.0.0",
+    "next": "15.5.6",
     "next-international": "^1.2.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -28,8 +28,7 @@
     "tify": "^0.30.2"
   },
   "devDependencies": {
-    "@blueprintjs/core": "^5.13.1",
-    "@blueprintjs/icons": "^5.13.0",
+    "@biomejs/biome": "^2.3.0",
     "@tailwindcss/typography": "^0.5.10",
     "@types/node": "^20.11.28",
     "@types/papaparse": "^5.3.14",
@@ -41,7 +40,7 @@
     "eslint-config-next": "16.0.0",
     "papaparse": "^5.4.1",
     "postcss": "^8.4.35",
-    "prisma": "^5.11.0",
+    "prisma": "^6.18.0",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.11.2",
     "typescript": "^5.4.2"
@@ -53,8 +52,9 @@
     },
     "onlyBuiltDependencies": [
       "@prisma/client",
+      "@prisma/engines",
       "esbuild",
-      "sharp",
+      "prisma",
       "tify",
       "unrs-resolver"
     ]
