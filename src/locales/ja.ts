@@ -55,4 +55,11 @@ export default {
   iiif_availability:"IIIF利用可能",
   book_not_found:"文献が見つかりません",
   no_iiif_manifest:"IIIFマニフェストがありません",
+  age:"年代",
+  owner:"所有者",
+  inputor:"入力者",
+  pictures:"画像",
+  guides:"ガイド",
+  informations:"情報",
+  bibs:"文献",
 } as const;

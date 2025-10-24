@@ -55,4 +55,11 @@ export default {
   iiif_availability:"IIIF可用性",
   book_not_found:"未找到文献",
   no_iiif_manifest:"没有IIIF清单",
+  age:"年代",
+  owner:"所有者",
+  inputor:"输入者",
+  pictures:"图片",
+  guides:"指南",
+  informations:"信息",
+  bibs:"文献",
 } as const;

@@ -10,7 +10,7 @@ export default function PaginationPanel({ maxPage }: { maxPage: number }) {
 
   const currentPage = Number(searchParams.get("page") ?? 1);
 
-  const newSearchParams = new URLSearchParams(searchParams);
+  const newSearchParams = new URLSearchParams(searchParams.toString());
 
   const changePage = (page: number) => {
     newSearchParams.set("page", String(page));

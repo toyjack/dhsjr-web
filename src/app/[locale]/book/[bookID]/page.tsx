@@ -30,7 +30,40 @@ export default async function BookPage({
         <SearcWordInBookBtn bookId={params.bookID} />
       </div>
       <div className="prose prose-sm md:prose-base w-full max-w-4xl flex-grow pt-10">
-        <ReactMarkdown>{bookData}</ReactMarkdown>
+        <h1>{bookData.title}</h1>
+        <h2>
+          {t("age")}: {bookData.age}
+        </h2>
+        <h3>
+          {t("owner")}: {bookData.owner}
+        </h3>
+        <h3>
+          {t("inputor")}: {bookData.inputor}
+        </h3>
+
+        <div className="divider" />
+        <h3>
+          {t("pictures")}
+        </h3>
+          <ReactMarkdown>{bookData.pictures.join(", ")}</ReactMarkdown>
+        <div className="divider" />
+
+        <h3>{t("guides")}</h3>
+        {bookData.guide.map((g, index) => (
+          <p key={index}>{g}</p>
+        ))}
+        <div className="divider" />
+
+        <h3>{t("informations")}</h3>
+        {bookData.information.map((info, index) => (
+          <p key={index}>{info}</p>
+        ))}
+        <div className="divider" />
+        <h3>{t("bibs")}</h3>
+        {bookData.bibs.map((bib, index) => (
+          <p key={index}>{bib}</p>
+        ))}
+        
       </div>
 
       <div className="divider" />

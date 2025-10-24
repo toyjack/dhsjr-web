@@ -17,7 +17,7 @@ export default function PerPageSetting() {
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setPerPage(Number(e.target.value));
-    const newSearchParams = new URLSearchParams(searchParams);
+    const newSearchParams = new URLSearchParams(searchParams.toString());
     newSearchParams.set("perPage", e.target.value);
     newSearchParams.set("page", "1");
     const newUrl = `${pathname}?${newSearchParams.toString()}`;

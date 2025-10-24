@@ -57,4 +57,11 @@ export default {
   iiif_availability:"IIIF Availability",
   book_not_found:"Book not found",
   no_iiif_manifest:"No IIIF Manifest",
+  age:"Age",
+  owner:"Owner",
+  inputor:"Inputor",
+  pictures:"Pictures",
+  guides:"Guides",
+  informations:"Informations",
+  bibs:"Bibliographies",
 } as const;
