@@ -57,7 +57,8 @@
       "esbuild",
       "prisma",
       "tify",
-      "unrs-resolver"
+      "unrs-resolver",
+      "sharp"
     ]
   }
 }
