@@ -1,6 +1,5 @@
 import { getBookList } from "@/lib/db";
 import Link from "next/link";
-import React from "react";
 import { ALL_MANIFEST } from "../../../../contents/manifest";
 import { getI18n } from "@/locales/server";
 

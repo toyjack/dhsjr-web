@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React from "react";
 
 export default function PaginationPanel({ maxPage }: { maxPage: number }) {
   const path = usePathname();
@@ -31,13 +30,13 @@ export default function PaginationPanel({ maxPage }: { maxPage: number }) {
     }
   };
 
-  const onClickFirst = () => {
-    changePage(1);
-  };
+  // const onClickFirst = () => {
+  //   changePage(1);
+  // };
 
-  const onClickLast = () => {
-    changePage(maxPage);
-  };
+  // const onClickLast = () => {
+  //   changePage(maxPage);
+  // };
 
   return (
     <div className="join">

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React from "react";
+
 const FileIcon = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
