@@ -1,5 +1,7 @@
 import type { BookList, Inputs, SearchResults } from "@/types";
 import { prisma } from "./prisma";
+import { dhsjr } from "@prisma/client";
+import { getCharByFullTextSearch } from "@prisma/client/sql";
 
 const PAGE = 1;
 const PER_PAGE = 100;
@@ -164,4 +166,12 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
     },
     data: results,
   } as SearchResults;
+}
+
+export async function fts(character: string) {
+  // const result = await prisma.$queryRaw<dhsjr[]>`
+  //   select * from dhsjr where dhsjr.漢語_見出し &@~ ${character};
+  // `;
+  const result = await prisma.$queryRawTyped(getCharByFullTextSearch(character))
+  return result;
 }
