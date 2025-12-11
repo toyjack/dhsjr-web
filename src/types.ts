@@ -1,4 +1,4 @@
-import type { Dhsjr } from "@prisma/client";
+import type { Dhsjr } from "@/lib/field-mapping";
 
 export type Inputs = {
   character: string;

@@ -3,18 +3,21 @@ import React from "react";
 
 export default function WordCell({
   word = "",
-  position = 0,
+  position,
 }: {
   word?: string;
-  position?: number;
+  position?: string;
 }) {
+  // Convert position to number if it's a string
+  const positionNumber = position ? Number.parseInt(position, 10) : 0;
+
   return (
     <div>
       {word.split("").map((char, index) => (
         <span
           // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
           key={index}
-          className={cn({ "text-red-500": index === position - 1 })}
+          className={cn({ "text-red-500": index === positionNumber - 1 })}
         >
           {char}
         </span>

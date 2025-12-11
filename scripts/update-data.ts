@@ -1,42 +1,63 @@
-// Rewritten script with Claude Sonnet 4
+// Rewritten script to use Supabase instead of Prisma
 import fs from "fs";
 import path from "path";
 import { parse } from "papaparse";
-import { Dhsjr } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { createClient } from "@supabase/supabase-js";
+import type { Database, TablesInsert } from "@/types/supabase.type";
 
 console.log("Updating Dhsjr data...");
 
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error(
+    "Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY"
+  );
+}
+
+const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: false,
+  },
+});
+
 const dataFolderPath = path.resolve(process.cwd(), "contents/data/");
 
-// Header mapping configuration
-const HEADER_MAPPING: Record<string, keyof Dhsjr> = {
-  ID: "character_id",
-  資料番号: "book_id",
-  資料名: "book_name",
-  資料内漢字番号: "index_in_book",
-  資料内漢語番号: "word_index_in_book",
-  単字_見出し: "character",
-  単字_出現形: "character_original",
-  漢語_見出し: "word",
-  漢語_出現形: "word_original",
-  漢語_alphabet: "word_alphabet",
-  語種: "word_type",
-  位置: "pos_in_word",
-  単字長さ: "len",
-  声点: "shoten",
-  声点型: "shoten_word",
-  仮名注: "kana",
-  仮名型: "word_kana",
-  反切: "fanqie",
-  類音: "ruion",
-  節博士: "hakase",
-  その他: "etc",
-  出現位置: "position_in_book",
-  備考: "notes",
+// Type for dhsjr insert - using Japanese column names
+type DhsjrInsert = TablesInsert<"dhsjr">;
+
+// Header mapping configuration - maps Japanese headers to Japanese column names
+const HEADER_MAPPING: Record<string, keyof DhsjrInsert> = {
+  ID: "ID",
+  資料番号: "資料番号",
+  資料名: "資料名",
+  資料内漢字番号: "資料内漢字番号",
+  資料内漢語番号: "資料内漢語番号",
+  単字_見出し: "単字_見出し",
+  単字_出現形: "単字_出現形",
+  漢語_見出し: "漢語_見出し",
+  漢語_出現形: "漢語_出現形",
+  漢語_alphabet: "漢語_alphabet",
+  語種: "語種",
+  位置: "漢語内位置",
+  単字長さ: "単字長",
+  声点: "声点",
+  声点型: "声点型",
+  仮名注: "仮名注",
+  仮名型: "仮名型",
+  反切: "反切",
+  類音: "類音",
+  節博士: "節博士",
+  その他: "その他",
+  出現位置: "出現位置",
+  備考: "備考",
 } as const;
 
-const INTEGER_FIELDS = new Set(["word_index_in_book", "index_in_book", "pos_in_word"]);
+const INTEGER_FIELDS = new Set(["資料内漢語番号", "資料内漢字番号", "漢語内位置"]);
 
 /**
  * Gets the newest non-hidden file from the data directory
@@ -44,7 +65,7 @@ const INTEGER_FIELDS = new Set(["word_index_in_book", "index_in_book", "pos_in_w
 function getNewestDataFile(): string {
   try {
     const files = fs.readdirSync(dataFolderPath);
-    
+
     if (files.length === 0) {
       throw new Error("No files found in data directory");
     }
@@ -53,7 +74,7 @@ function getNewestDataFile(): string {
 
     // Sort files by modification time (newest first)
     const sortedFiles = files
-      .filter(file => !file.startsWith(".")) // Filter out hidden files
+      .filter((file) => !file.startsWith(".")) // Filter out hidden files
       .sort((a, b) => {
         const statsA = fs.statSync(path.join(dataFolderPath, a));
         const statsB = fs.statSync(path.join(dataFolderPath, b));
@@ -74,10 +95,10 @@ function getNewestDataFile(): string {
 /**
  * Parses CSV file and transforms data
  */
-function parseDataFile(filePath: string): Dhsjr[] {
+function parseDataFile(filePath: string): DhsjrInsert[] {
   try {
     const fileContents = fs.readFileSync(filePath, "utf-8");
-    
+
     const parseResult = parse<Record<string, string>>(fileContents, {
       delimiter: "\t",
       header: true,
@@ -86,8 +107,8 @@ function parseDataFile(filePath: string): Dhsjr[] {
       transform: (value: string, field: string) => {
         // Convert integer fields
         if (INTEGER_FIELDS.has(field) && value) {
-          const parsed = parseInt(value, 10);
-          return isNaN(parsed) ? null : parsed;
+          const parsed = Number.parseInt(value, 10);
+          return Number.isNaN(parsed) ? null : parsed;
         }
         // Return null for empty strings to maintain database consistency
         return value === "" ? null : value;
@@ -97,8 +118,8 @@ function parseDataFile(filePath: string): Dhsjr[] {
     if (parseResult.errors.length > 0) {
       console.warn("Parse errors:", parseResult.errors);
     }
-    // @ts-ignore
-    return parseResult.data as Dhsjr[];
+
+    return parseResult.data as unknown as DhsjrInsert[];
   } catch (error) {
     console.error("Error parsing data file:", error);
     throw error;
@@ -108,7 +129,7 @@ function parseDataFile(filePath: string): Dhsjr[] {
 /**
  * Updates database with parsed data using batch operations for better performance
  */
-async function updateDhsjrData(data: Dhsjr[]): Promise<void> {
+async function updateDhsjrData(data: DhsjrInsert[]): Promise<void> {
   const BATCH_SIZE = 100;
   let processed = 0;
 
@@ -116,17 +137,16 @@ async function updateDhsjrData(data: Dhsjr[]): Promise<void> {
     // Process data in batches for better performance
     for (let i = 0; i < data.length; i += BATCH_SIZE) {
       const batch = data.slice(i, i + BATCH_SIZE);
-      
-      // Use transaction for batch operations
-      await prisma.$transaction(
-        batch.map(row => 
-          prisma.dhsjr.upsert({
-            where: { character_id: row.character_id },
-            update: row,
-            create: row,
-          })
-        )
-      );
+
+      // Use upsert for batch operations
+      const { error } = await supabase.from("dhsjr").upsert(batch, {
+        onConflict: "ID",
+      });
+
+      if (error) {
+        console.error(`Error at batch ${i}-${i + batch.length}:`, error);
+        throw error;
+      }
 
       processed += batch.length;
       console.log(`Processed ${processed}/${data.length} records...`);
@@ -147,7 +167,7 @@ async function main(): Promise<void> {
     // Get newest file
     const newestFile = getNewestDataFile();
     const filePath = path.join(dataFolderPath, newestFile);
-    
+
     console.log(`Processing file: ${newestFile}`);
 
     // Parse data
@@ -162,12 +182,9 @@ async function main(): Promise<void> {
     // Update database
     await updateDhsjrData(data);
     console.log("Data updated successfully");
-
   } catch (error) {
     console.error("Fatal error:", error);
     throw error;
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

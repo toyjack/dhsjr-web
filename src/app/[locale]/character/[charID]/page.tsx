@@ -1,5 +1,6 @@
 import WordCell from "@/components/word-cell";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
+import { rowToDhsjr } from "@/lib/field-mapping";
 import { getI18n } from "@/locales/server";
 import Link from "next/link";
 import { ALL_MANIFEST } from "../../../../../contents/manifest";
@@ -13,12 +14,17 @@ export default async function CharacterPage(
   const params = await props.params;
   const t = await getI18n();
 
-  // TODO: move to db
-  const character = await prisma.dhsjr.findUnique({
-    where: {
-      character_id: params.charID,
-    },
-  });
+  const { data, error } = await supabase
+    .from("dhsjr")
+    .select("*")
+    .eq("ID", params.charID)
+    .single();
+
+  if (error || !data) {
+    return <div>{t("character_not_found")}</div>;
+  }
+
+  const character = rowToDhsjr(data);
 
   if (!character) {
     return <div>{t("character_not_found")}</div>;

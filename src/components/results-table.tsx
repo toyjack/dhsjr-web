@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dhsjr } from "@prisma/client";
+import type { Dhsjr } from "@/lib/field-mapping";
 import RubyCell from "./ruby-cell";
 import Link from "next/link";
 import { useI18n } from "@/locales/client";

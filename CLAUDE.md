@@ -9,14 +9,10 @@ This is a multilingual web application for searching Japanese character and word
 ## Development Commands
 
 ### Core Development
-- `pnpm dev` - Start development server (runs `prisma generate` first)
-- `pnpm build` - Build for production (runs `prisma generate` first)
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint linter
-
-### Database
-- `pnpm studio` - Open Prisma Studio to view/edit database
-- `prisma generate` - Generate Prisma Client (automatically run before dev/build)
 
 ### Data Management Scripts
 - `pnpm data:update` - Import/update character data from TSV files in `contents/data/`
@@ -26,7 +22,8 @@ This is a multilingual web application for searching Japanese character and word
 
 ### Stack
 - **Framework**: Next.js 15 (App Router)
-- **Database**: PostgreSQL via Prisma ORM
+- **Database**: Supabase (PostgreSQL)
+- **Database Client**: @supabase/supabase-js
 - **Styling**: Tailwind CSS + DaisyUI
 - **State Management**: Jotai
 - **Internationalization**: next-international (ja/en/zh locales)
@@ -35,22 +32,26 @@ This is a multilingual web application for searching Japanese character and word
 
 ### Database Architecture
 
-The application uses a single Prisma model `dhsjr` that stores character and word phonetic data. Key fields include:
+The application uses a single table `dhsjr` that stores character and word phonetic data. Key fields include:
 - Character information: `character`, `character_original`, `character_id`
 - Word information: `word`, `word_original`, `word_alphabet`
 - Phonetic annotations: `kana`, `shoten`, `fanqie`, `ruion`, `word_kana`, `shoten_word`
 - Book metadata: `book_id`, `book_name`, `index_in_book`
 - Additional fields: `word_type`, `pos_in_word`, `hakase`, `etc`, `notes`
 
-Database connection is managed through a singleton pattern in [src/lib/prisma.ts](src/lib/prisma.ts) to prevent connection exhaustion in development.
+Database connection is managed through a singleton Supabase client in [src/lib/supabase.ts](src/lib/supabase.ts) to prevent connection exhaustion in development.
+
+Type definitions for the database schema are in [src/types/database.ts](src/types/database.ts), including the `Database` interface and `Dhsjr` type.
 
 ### Search System
 
-Two main search functions in [src/lib/db.ts](src/lib/db.ts):
-1. **searchAll()** - Global search across all text fields (character, kana, word, book name, etc.)
-2. **search()** - Detailed search allowing field-specific filtering via `Inputs` type
+Three main search functions in [src/lib/db.ts](src/lib/db.ts):
+1. **getBookList()** - Get list of all unique books
+2. **searchAll()** - Global search across all text fields (character, kana, word, book name, etc.) using `ilike` for case-insensitive matching
+3. **search()** - Detailed search allowing field-specific filtering via `Inputs` type
+4. **fts()** - Full-text search function (basic implementation using `ilike`)
 
-Both support pagination with configurable `page` and `perPage` parameters.
+All search functions support pagination with configurable `page` and `perPage` parameters.
 
 ### Internationalization
 
@@ -116,7 +117,8 @@ Use `@/` prefix for imports from `src/` directory (configured in [tsconfig.json]
 ### TypeScript
 - Strict mode enabled
 - Use explicit types from [src/types.ts](src/types.ts): `Inputs`, `BookList`, `SearchResults`
-- Prisma types imported from `@prisma/client`
+- Database types imported from `@/types/database`
+- The `Dhsjr` type represents a row in the dhsjr table
 
 ### Styling
 - Use Tailwind utility classes
@@ -128,8 +130,8 @@ Use `@/` prefix for imports from `src/` directory (configured in [tsconfig.json]
 When running `data:update`:
 - Reads newest TSV file from `contents/data/`
 - Maps Japanese headers to English field names via `HEADER_MAPPING`
-- Processes data in batches of 100 using Prisma transactions
-- Uses upsert to handle both new and existing records
+- Processes data in batches of 100 using Supabase `upsert` operations
+- Uses `onConflict: "character_id"` to handle both new and existing records
 
 ### Biome Configuration
 - Formatter: 2-space indentation
@@ -140,7 +142,8 @@ When running `data:update`:
 ## Database Environment Variables
 
 Required environment variables (not in repo):
-- `DATABASE_URL` - PostgreSQL connection string
-- `DIRECT_URL` - Direct database connection for migrations (Supabase-specific)
+- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anonymous/public key
+- `SUPABASE_SERVICE_ROLE_KEY` - (Optional) Service role key for server-side operations with elevated privileges
 
-Recent migration to Supabase is noted in git history.
+See [.env.example](.env.example) for the template.
