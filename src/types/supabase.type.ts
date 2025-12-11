@@ -268,6 +268,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_dhsjr_by_word: { Args: { search_query: string }; Returns: number }
+      count_dhsjr_fulltext: { Args: { search_query: string }; Returns: number }
       pgroonga_command:
         | { Args: { groongacommand: string }; Returns: string }
         | {
@@ -693,6 +695,98 @@ export type Database = {
       pgroonga_wal_truncate:
         | { Args: never; Returns: number }
         | { Args: { indexname: unknown }; Returns: number }
+      search_dhsjr_by_word: {
+        Args: { page_number?: number; page_size?: number; search_query: string }
+        Returns: {
+          ID: string
+          score: number
+          その他: string
+          仮名型: string
+          仮名注: string
+          備考: string
+          出現位置: string
+          単字_出現形: string
+          単字_見出し: string
+          単字長: string
+          反切: string
+          声点: string
+          声点型: string
+          漢語_alphabet: string
+          漢語_出現形: string
+          漢語_見出し: string
+          漢語内位置: string
+          節博士: string
+          語種: string
+          資料内漢字番号: number
+          資料内漢語番号: string
+          資料名: string
+          資料番号: string
+          類音: string
+        }[]
+      }
+      search_dhsjr_field: {
+        Args: {
+          field_name: string
+          page_number?: number
+          page_size?: number
+          search_query: string
+        }
+        Returns: {
+          ID: string
+          score: number
+          その他: string
+          仮名型: string
+          仮名注: string
+          備考: string
+          出現位置: string
+          単字_出現形: string
+          単字_見出し: string
+          単字長: string
+          反切: string
+          声点: string
+          声点型: string
+          漢語_alphabet: string
+          漢語_出現形: string
+          漢語_見出し: string
+          漢語内位置: string
+          節博士: string
+          語種: string
+          資料内漢字番号: number
+          資料内漢語番号: string
+          資料名: string
+          資料番号: string
+          類音: string
+        }[]
+      }
+      search_dhsjr_fulltext: {
+        Args: { page_number?: number; page_size?: number; search_query: string }
+        Returns: {
+          ID: string
+          score: number
+          その他: string
+          仮名型: string
+          仮名注: string
+          備考: string
+          出現位置: string
+          単字_出現形: string
+          単字_見出し: string
+          単字長: string
+          反切: string
+          声点: string
+          声点型: string
+          漢語_alphabet: string
+          漢語_出現形: string
+          漢語_見出し: string
+          漢語内位置: string
+          節博士: string
+          語種: string
+          資料内漢字番号: number
+          資料内漢語番号: string
+          資料名: string
+          資料番号: string
+          類音: string
+        }[]
+      }
       search_jyobatsu_raw_text: {
         Args: { search_query: string }
         Returns: {
@@ -702,6 +796,7 @@ export type Database = {
           text: string
         }[]
       }
+      truncate_dhsjr: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

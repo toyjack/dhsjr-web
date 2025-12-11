@@ -45,13 +45,28 @@ Type definitions for the database schema are in [src/types/database.ts](src/type
 
 ### Search System
 
-Three main search functions in [src/lib/db.ts](src/lib/db.ts):
+Search functions in [src/lib/db.ts](src/lib/db.ts):
+
+**Basic Search:**
 1. **getBookList()** - Get list of all unique books
-2. **searchAll()** - Global search across all text fields (character, kana, word, book name, etc.) using `ilike` for case-insensitive matching
+2. **searchAll()** - Global search across all text fields using `ilike` for case-insensitive matching
 3. **search()** - Detailed search allowing field-specific filtering via `Inputs` type
-4. **fts()** - Full-text search function (basic implementation using `ilike`)
+
+**PGroonga Full-Text Search (Recommended for Japanese text):**
+4. **fullTextSearch()** - Advanced full-text search using PGroonga extension via RPC
+   - Supports complex queries: OR, AND, -, *, phrase search
+   - Returns results sorted by relevance score
+   - Optimized for Japanese text
+5. **searchField()** - Search in specific field using PGroonga
+6. **fts()** - Legacy function (uses fullTextSearch internally)
 
 All search functions support pagination with configurable `page` and `perPage` parameters.
+
+**PGroonga Setup:**
+- SQL setup: [supabase/functions/full_text_search.sql](supabase/functions/full_text_search.sql)
+- Documentation: [README_PGROONGA.md](README_PGROONGA.md)
+- Quick start: [docs/SETUP_STEPS.md](docs/SETUP_STEPS.md)
+- Examples: [docs/pgroonga-examples.md](docs/pgroonga-examples.md)
 
 ### Internationalization
 
