@@ -7,8 +7,8 @@ const PER_PAGE = 100;
 
 export async function getBookList() {
   const { data, error } = await supabase
-    .from("dhsjr")
-    .select("*")
+    .from("book_list_dhsjr")
+    .select("*",)
     .order("資料番号", { ascending: true });
 
   if (error) {
@@ -18,16 +18,20 @@ export async function getBookList() {
   if (!data) {
     return [] as BookList;
   }
+  
 
   // Remove duplicates manually since Supabase doesn't have groupBy
+  // 20-039-18
   const uniqueBooks = Array.from(
     new Map(
       data.map((item) => [
-        item.資料番号,
-        { book_id: item.資料番号, book_name: item.資料名 },
+        item.資料番号.split("-").splice(0,2).join("-"),
+        { book_id: item.資料番号.split("-").splice(0,2).join("-"), book_name: item.資料名 },
       ])
     ).values()
   );
+
+  console.log("Unique Books:", uniqueBooks);
 
   return uniqueBooks as BookList;
 }
@@ -102,7 +106,7 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
     query = query.ilike(FIELD_TO_COLUMN.notes, `%${params.notes}%`);
   }
   if (params.book_id) {
-    query = query.eq(FIELD_TO_COLUMN.book_id, params.book_id);
+    query = query.ilike(FIELD_TO_COLUMN.book_id, `${params.book_id}%`);
   }
 
   // Apply pagination
