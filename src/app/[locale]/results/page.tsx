@@ -32,6 +32,8 @@ export default async function ResultPage(
     );
   }
 
+  console.log(data.meta);
+
   const maxPage = Math.ceil(data.meta.count / data.meta.perPage);
 
   const t = await getI18n();

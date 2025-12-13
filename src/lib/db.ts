@@ -41,7 +41,10 @@ export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
       page_size: perPage
      });
 
-  const { data, count, error } = await query;
+  const { data, error } = await query;
+
+  const queryCount = supabase.rpc("count_dhsjr_by_word", { search_query: term });
+  const { data: count, error: countError } = await queryCount;
 
   if (error) {
     throw new Error(`Search failed: ${error.message}`);
