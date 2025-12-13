@@ -10,7 +10,7 @@
     "data:update": "tsx scripts/update-data.ts",
     "data:gen-book": "tsx scripts/gen-book.ts",
     "supabase": "supabase",
-    "gen:types":"supabase gen types typescript --project-id uubujwfsfcihyfyeoszd > .\\src\\types\\supabase.type.ts"
+    "gen:types": "supabase gen types typescript --project-id uubujwfsfcihyfyeoszd > .\\src\\types\\supabase.type.ts"
   },
   "dependencies": {
     "@next/third-parties": "16.0.0",
@@ -18,7 +18,7 @@
     "clsx": "^2.1.0",
     "jotai": "^2.7.1",
     "mirador": "4.0.0-alpha.2",
-    "next": "15.5.6",
+    "next": "15.5.7",
     "next-international": "^1.2.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -55,7 +55,7 @@
     "onlyBuiltDependencies": [
       "@prisma/client",
       "esbuild",
-      "supabase",
+      "sharp",
       "tify",
       "unrs-resolver"
     ]
