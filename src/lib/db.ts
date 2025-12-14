@@ -26,7 +26,9 @@ export async function getBookList() {
   const uniqueBooks = Array.from(
     new Map(
       data.map((item) => [
+        // @ts-ignore
         item.資料番号.split("-").splice(0,2).join("-"),
+        // @ts-ignore
         { book_id: item.資料番号.split("-").splice(0,2).join("-"), book_name: item.資料名 },
       ])
     ).values()
