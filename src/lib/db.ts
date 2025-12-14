@@ -7,6 +7,7 @@ const PER_PAGE = 100;
 
 export async function getBookList() {
   const { data, error } = await supabase
+  // @ts-ignore - Supabase infers types automatically, but sometimes makes mistakes
     .from("book_list_dhsjr")
     .select("*",)
     .order("資料番号", { ascending: true });
