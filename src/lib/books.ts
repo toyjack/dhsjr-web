@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import Books from "../../contents/books.json";
+import { BookList } from "@/types";
 
 export interface BookData {
     id: string
@@ -28,6 +29,14 @@ export async function getBookData(bookId: string) {
   }
   return book;
 
+}
+
+export async function getBookList(): Promise<BookList> {
+  const books = Books as BookData[];
+  return books.map((b) => ({
+    book_id: b.id,
+    book_name: b.title,
+  }));
 }
 
 export async function getAllBooksFileNameList() {

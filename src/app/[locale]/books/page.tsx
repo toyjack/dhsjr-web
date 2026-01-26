@@ -1,7 +1,7 @@
-import { getBookList } from "@/lib/db";
 import Link from "next/link";
 import { ALL_MANIFEST } from "../../../../contents/manifest";
 import { getI18n } from "@/locales/server";
+import { getAllBooksFileNameList, getBookList } from "@/lib/books";
 
 export default async function BooksPage() {
   const t = await getI18n();
@@ -25,8 +25,8 @@ export default async function BooksPage() {
             </tr>
           </thead>
           <tbody>
-            {allBooks.map((book) => (
-              <tr key={book.book_id} className="hover:bg-base-300">
+            {allBooks.map((book,index) => (
+              <tr key={book.book_id+index} className="hover:bg-base-300">
                 <td><Link href={`/book/${book.book_id}`}>{book.book_id}</Link></td>
                 <td><Link href={`/book/${book.book_id}`}>{book.book_name}</Link></td>
                 <td>{hasManifest(book.book_id) ? "Yes":"No"}</td>

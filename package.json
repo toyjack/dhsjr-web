@@ -55,7 +55,7 @@
     "onlyBuiltDependencies": [
       "@prisma/client",
       "esbuild",
-      "sharp",
+      "supabase",
       "tify",
       "unrs-resolver"
     ]
