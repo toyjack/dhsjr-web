@@ -1,4 +1,4 @@
-横断漢字音簡易検索ウェブアプリ
+DHSJR検索WEBアプリ
 
 ## Getting Started
 
