@@ -11,7 +11,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 const notoSans = Noto_Sans({ display: "swap", preload: false });
 
 export const metadata: Metadata = {
-  title: "資料横断的な漢字音・漢語音データベース",
+  title: "DHSJR検索",
   description:
     "本データベース（略称：DHSJR）は、平安・鎌倉期～現代までの文献資料に現われる漢字音・漢語音を、字音注記（仮名注、声点、反切、類音注、節博士等）に即して検索可能とするものです。",
 };
