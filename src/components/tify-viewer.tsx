@@ -23,7 +23,7 @@ export default function TifyViewer({ manifestUrl, iiifPage }: { manifestUrl: str
       // @ts-ignore
       tify.destroy();
     }
-  });
+  }, [manifestUrl, currentLocale, iiifPage]);
 
   return (
     <div id="tify" style={{ height: "640px", minHeight: "90vh" }}>

@@ -5,12 +5,13 @@ import { supabase } from "./supabase";
 const PAGE = 1;
 const PER_PAGE = 100;
 
+type BookListRow = { 資料番号: string; 資料名: string };
+
 export async function getBookList() {
-  const { data, error } = await supabase
-  // @ts-ignore - Supabase infers types automatically, but sometimes makes mistakes
+  const { data, error } = await (supabase as any)
     .from("book_list_dhsjr")
-    .select("*",)
-    .order("資料番号", { ascending: true });
+    .select("*")
+    .order("資料番号", { ascending: true }) as { data: BookListRow[] | null; error: any };
 
   if (error) {
     throw new Error(`Failed to fetch book list: ${error.message}`);
@@ -19,29 +20,22 @@ export async function getBookList() {
   if (!data) {
     return [] as BookList;
   }
-  
 
   // Remove duplicates manually since Supabase doesn't have groupBy
-  // 20-039-18
   const uniqueBooks = Array.from(
     new Map(
       data.map((item) => [
-        // @ts-ignore
-        item.資料番号.split("-").splice(0,2).join("-"),
-        // @ts-ignore
-        { book_id: item.資料番号.split("-").splice(0,2).join("-"), book_name: item.資料名 },
+        item.資料番号.split("-").slice(0,2).join("-"),
+        { book_id: item.資料番号.split("-").slice(0,2).join("-"), book_name: item.資料名 },
       ])
     ).values()
   );
-
-  console.log("Unique Books:", uniqueBooks);
 
   return uniqueBooks as BookList;
 }
 
 export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
-  const query = supabase
-  // @ts-ignore - RPC function will be available after running SQL setup
+  const query = (supabase as any)
     .rpc("search_dhsjr_by_word", { 
       search_query: term, 
       page_number: page, 
@@ -50,11 +44,11 @@ export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
 
   const { data, error } = await query;
 
-  const queryCount = supabase.rpc("count_dhsjr_by_word", { search_query: term });
+  const queryCount = (supabase as any).rpc("count_dhsjr_by_word", { search_query: term });
   const { data: count, error: countError } = await queryCount;
 
-  if (error) {
-    throw new Error(`Search failed: ${error.message}`);
+  if (error || countError) {
+    throw new Error(`Search failed: ${error?.message || countError?.message}`);
   }
 
   // Convert rows to Dhsjr format

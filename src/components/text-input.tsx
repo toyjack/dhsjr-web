@@ -1,5 +1,5 @@
 import type { Inputs } from "@/types";
-import React from "react";
+import { cn } from "@/lib/utils";
 import type { Path, UseFormRegister } from "react-hook-form";
 
 export default function TextInput({
@@ -7,6 +7,7 @@ export default function TextInput({
   register,
   fieldLable,
   placeholder,
+  className,
 }: {
   label: Path<Inputs>;
   register: UseFormRegister<Inputs>;
@@ -22,7 +23,7 @@ export default function TextInput({
       <input
         type="text"
         placeholder={placeholder}
-        className="input input-bordered input-info w-full"
+        className={cn("input input-bordered input-info w-full", className)}
         {...register(label)}
       />
     </label>

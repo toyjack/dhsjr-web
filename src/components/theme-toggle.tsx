@@ -18,13 +18,7 @@ export default function ThemeToggle() {
   const [theme, setTheme] = useAtom(themeAtom);
 
   const toggleTheme = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.checked);
-    if (e.target.checked) {
-      setTheme("light");
-    }
-    if (!e.target.checked) {
-      setTheme("dark");
-    }
+    setTheme(e.target.checked ? "light" : "dark");
   };
 
   return (

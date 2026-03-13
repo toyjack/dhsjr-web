@@ -1,6 +1,7 @@
 import WordCell from "@/components/word-cell";
 import { supabase } from "@/lib/supabase";
 import { rowToDhsjr } from "@/lib/field-mapping";
+import { localePath } from "@/lib/utils";
 import { getI18n } from "@/locales/server";
 import Link from "next/link";
 import { ALL_MANIFEST } from "../../../../../contents/manifest";
@@ -8,7 +9,7 @@ import { IoImagesOutline } from "react-icons/io5";
 
 export default async function CharacterPage(
   props: {
-    params: Promise<{ charID: string }>;
+    params: Promise<{ locale: string; charID: string }>;
   }
 ) {
   const params = await props.params;
@@ -115,7 +116,7 @@ export default async function CharacterPage(
               <td>
                 <Link
                   className="link link-hover text-info flex gap-1"
-                  href={`/book/${character?.book_id}`}
+                  href={localePath(`/book/${character?.book_id}`, params.locale)}
                 >
                   {character?.book_id}
                   {manifest && <IoImagesOutline className="text-base" />}
@@ -128,7 +129,7 @@ export default async function CharacterPage(
               <td>
                 <Link
                   className="link link-hover text-info flex gap-1"
-                  href={`/book/${character?.book_id}`}
+                  href={localePath(`/book/${character?.book_id}`, params.locale)}
                 >
                   {character?.book_name}
                   {manifest && <IoImagesOutline className="text-base" />}

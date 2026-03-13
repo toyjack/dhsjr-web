@@ -22,6 +22,7 @@ export default function SearchAllForm() {
   const [perPage] = useAtom(perPageAtom);
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
+    if (!data.query?.trim()) return;
     const path = `/results?${new URLSearchParams(
       data
     ).toString()}&page=1&perPage=${perPage}`;

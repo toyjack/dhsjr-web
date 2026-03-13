@@ -18,7 +18,7 @@ export default async function Header() {
       <div className="flex-none gap-2">
         <div>
           <Link href={"/books"} className="btn btn-ghost">
-            <IoBookOutline className="text-2xl" /> 文献一覧
+            <IoBookOutline className="text-2xl" /> {t("all_books_list")}
           </Link>
         </div>
         <ThemeToggle />

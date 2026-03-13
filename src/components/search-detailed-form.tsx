@@ -26,9 +26,15 @@ export default function SearchDetailedForm({
   const [perPage] = useAtom(perPageAtom);
 
   const onAdvancedSubmit: SubmitHandler<Inputs> = (data) => {
-    const path = `/results?${new URLSearchParams(
-      data
-    ).toString()}&page=1&perPage=${perPage}`;
+    const hasValue = Object.values(data).some(val => val && String(val).trim() !== '');
+    if (!hasValue) return;
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(data)) {
+      if (value) params.append(key, String(value));
+    }
+    params.append('page', '1');
+    params.append('perPage', String(perPage));
+    const path = `/results?${params.toString()}`;
     router.push(path);
   };
 

@@ -11,10 +11,13 @@ export default async function ResultPage(
   }
 ) {
   const searchParams = await props.searchParams;
-  // TODO check if string in searchParams is empty
-  if (!searchParams) {
-    // add i18n
-    return <div>検索条件が指定されていません。</div>;
+  // Check if searchParams is empty or all values are empty strings
+  const hasSearchTerms = searchParams && Object.entries(searchParams).some(
+    ([key, value]) => key !== 'page' && key !== 'perPage' && value && String(value).trim() !== ''
+  );
+  if (!hasSearchTerms) {
+    const t = await getI18n();
+    return <div className="p-4 text-center">{t("searchConditionRequired")}</div>;
   }
 
   let data: SearchResults;

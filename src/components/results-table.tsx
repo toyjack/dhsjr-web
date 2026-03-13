@@ -1,12 +1,14 @@
 "use client";
 
 import type { Dhsjr } from "@/lib/field-mapping";
+import { localePath } from "@/lib/utils";
 import RubyCell from "./ruby-cell";
 import Link from "next/link";
-import { useI18n } from "@/locales/client";
+import { useI18n, useCurrentLocale } from "@/locales/client";
 
 export default function ResultsTable({ data }: { data: Dhsjr[] }) {
   const t = useI18n();
+  const locale = useCurrentLocale();
 
   return (
     <div className="overflow-x-auto w-full">
@@ -42,7 +44,7 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
             <tr key={row.character_id}>
               <th>
                 <Link
-                  href={`/character/${row.character_id}`}
+                  href={localePath(`/character/${row.character_id}`, locale)}
                   className="link link-hover"
                 >
                   {row.character_id}
@@ -53,7 +55,7 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                   <div>
                     <Link
                       className="link link-hover"
-                      href={`/book/${row.book_id}`}
+                      href={localePath(`/book/${row.book_id}`, locale)}
                     >
                       {row.book_name}
                     </Link>
@@ -70,7 +72,7 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                   rubyBottom={row.kana}
                   fanqie={row.fanqie}
                   ruion={row.ruion}
-                  href={`/character/${row.character_id}`}
+                  href={localePath(`/character/${row.character_id}`, locale)}
                 />
               </td>
               <td className="text-2xl">
@@ -85,7 +87,7 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
               </td>
               <td>
                 <Link
-                  href={`/character/${row.character_id}`}
+                  href={localePath(`/character/${row.character_id}`, locale)}
                   className="btn btn-primary"
                 >
                   {t("details")}

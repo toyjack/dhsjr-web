@@ -1,9 +1,15 @@
 import Link from "next/link";
 import { ALL_MANIFEST } from "../../../../contents/manifest";
 import { getI18n } from "@/locales/server";
-import { getAllBooksFileNameList, getBookList } from "@/lib/books";
+import { getBookList } from "@/lib/books";
+import { localePath } from "@/lib/utils";
 
-export default async function BooksPage() {
+export default async function BooksPage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
   const t = await getI18n();
   const allBooks = await getBookList();
   const hasManifest = (bookId:string)=>{
@@ -27,9 +33,9 @@ export default async function BooksPage() {
           <tbody>
             {allBooks.map((book,index) => (
               <tr key={book.book_id+index} className="hover:bg-base-300">
-                <td><Link href={`/book/${book.book_id}`}>{book.book_id}</Link></td>
-                <td><Link href={`/book/${book.book_id}`}>{book.book_name}</Link></td>
-                <td>{hasManifest(book.book_id) ? "Yes":"No"}</td>
+                <td><Link href={localePath(`/book/${book.book_id}`, params.locale)}>{book.book_id}</Link></td>
+                <td><Link href={localePath(`/book/${book.book_id}`, params.locale)}>{book.book_name}</Link></td>
+                <td>{hasManifest(book.book_id) ? t("iiif_yes") : t("iiif_no")}</td>
               </tr>
             ))}
           </tbody>
