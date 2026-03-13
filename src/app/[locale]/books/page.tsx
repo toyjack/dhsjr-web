@@ -3,6 +3,11 @@ import { ALL_MANIFEST } from "../../../../contents/manifest";
 import { getI18n } from "@/locales/server";
 import { getBookList } from "@/lib/books";
 import { localePath } from "@/lib/utils";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "DHSJR - Books",
+};
 
 export default async function BooksPage(
   props: {

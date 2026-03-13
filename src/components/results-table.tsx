@@ -10,6 +10,10 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
   const t = useI18n();
   const locale = useCurrentLocale();
 
+  if (!data || data.length === 0) {
+    return <div className="p-8 text-center text-base-content/60">{t("noResults")}</div>;
+  }
+
   return (
     <div className="overflow-x-auto w-full">
       <table className="table">

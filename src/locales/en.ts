@@ -52,6 +52,8 @@ export default {
   character_id:"Character ID",
   show_all_records_of_this_book:"Show all records of this book",
   searchConditionRequired:"No search criteria specified.",
+  searchError:"An error occurred during search. Please try again with different criteria.",
+  noResults:"No matching data found.",
   character_not_found:"Character not found",
   all_books_list:"List of all books",
   book_name:"Book Name",

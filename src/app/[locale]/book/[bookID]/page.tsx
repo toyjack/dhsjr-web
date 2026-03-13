@@ -2,16 +2,23 @@ import { getBookData } from "@/lib/books";
 import ReactMarkdown from "react-markdown";
 import { ALL_MANIFEST } from "../../../../../contents/manifest";
 import dynamic from "next/dynamic";
-import SearcWordInBookBtn from "@/components/search-word-in-book-btn";
+import SearchWordInBookBtn from "@/components/search-word-in-book-btn";
 import { getI18n } from "@/locales/server";
+import type { Metadata } from "next";
 
 const DynamicIIIFViewer = dynamic(() => import("@/components/iiif-viewer"));
 
-export default async function BookPage(
-  props: {
-    params: Promise<{ bookID: string }>;
-  }
-) {
+type BookPageProps = {
+  params: Promise<{ bookID: string }>;
+};
+
+export async function generateMetadata({ params }: BookPageProps): Promise<Metadata> {
+  const { bookID } = await params;
+  const bookData = await getBookData(bookID);
+  return { title: bookData ? `DHSJR - ${bookData.title}` : "DHSJR - Book Not Found" };
+}
+
+export default async function BookPage(props: BookPageProps) {
   const params = await props.params;
   const t = await getI18n();
   const bookData = await getBookData(params.bookID);
@@ -26,7 +33,7 @@ export default async function BookPage(
   return (
     <div className="p-1 md:p-4">
       <div className="flex md:p-4">
-        <SearcWordInBookBtn bookId={params.bookID} />
+        <SearchWordInBookBtn bookId={params.bookID} />
       </div>
       <div className="prose prose-sm md:prose-base w-full max-w-4xl flex-grow pt-10">
         <h1>{bookData.title}</h1>

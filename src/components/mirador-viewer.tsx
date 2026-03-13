@@ -1,8 +1,15 @@
+"use client";
+
 import { useEffect, useMemo } from "react";
 import mirador from "mirador";
 import { useCurrentLocale } from "@/locales/client";
 
-const MiradorViewer = ({ manifestUrl, iiifPage }) => {
+interface MiradorViewerProps {
+  manifestUrl: string;
+  iiifPage: number;
+}
+
+const MiradorViewer = ({ manifestUrl, iiifPage }: MiradorViewerProps) => {
   const currentLocale = useCurrentLocale();
   const iiifIndex = iiifPage - 1;
 

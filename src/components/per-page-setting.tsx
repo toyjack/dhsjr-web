@@ -29,9 +29,10 @@ export default function PerPageSetting() {
       className="select select-bordered select-info w-full max-w-xs"
       value={perPage}
       onChange={(e) => handleChange(e)}
+      aria-label="Results per page"
     >
       {perPageOptions.map((option) => (
-        <option key={option} value={option} disabled={option === perPage}>
+        <option key={option} value={option}>
           {t("perPage", { count: option })}
         </option>
       ))}

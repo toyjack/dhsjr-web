@@ -5,7 +5,7 @@ import { useI18n } from "@/locales/client";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 
-export default function SearcWordInBookBtn({ bookId }: { bookId: string }) {
+export default function SearchWordInBookBtn({ bookId }: { bookId: string }) {
   const router = useRouter();
   const [perPage] = useAtom(perPageAtom);
   const t = useI18n();

@@ -50,6 +50,8 @@ export default {
   character_id:"単字ID",
   show_all_records_of_this_book:"この資料の全レコードを表示",
   searchConditionRequired:"検索条件が指定されていません。",
+  searchError:"検索中にエラーが発生しました。条件を変えて再度お試しください。",
+  noResults:"該当するデータが見つかりませんでした。",
   character_not_found:"単字が見つかりません",
   all_books_list:"文献資料一覧",
   book_name:"文献名",

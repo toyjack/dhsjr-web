@@ -6,12 +6,20 @@ import { getI18n } from "@/locales/server";
 import Link from "next/link";
 import { ALL_MANIFEST } from "../../../../../contents/manifest";
 import { IoImagesOutline } from "react-icons/io5";
+import type { Metadata } from "next";
 
-export default async function CharacterPage(
-  props: {
-    params: Promise<{ locale: string; charID: string }>;
-  }
-) {
+type CharacterPageProps = {
+  params: Promise<{ locale: string; charID: string }>;
+};
+
+export async function generateMetadata({ params }: CharacterPageProps): Promise<Metadata> {
+  const { charID } = await params;
+  const { data } = await supabase.from("dhsjr").select("*").eq("ID", charID).single();
+  const character = data ? rowToDhsjr(data).character : charID;
+  return { title: `DHSJR - ${character}` };
+}
+
+export default async function CharacterPage(props: CharacterPageProps) {
   const params = await props.params;
   const t = await getI18n();
 

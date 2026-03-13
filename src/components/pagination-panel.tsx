@@ -52,9 +52,10 @@ export default function PaginationPanel({ maxPage }: { maxPage: number }) {
         className="join-item select select-bordered select-info"
         value={currentPage}
         onChange={(e) => changePage(Number(e.target.value))}
+        aria-label="Page navigation"
       >
         {Array.from({ length: maxPage }, (_, i) => i + 1).map((page) => (
-          <option key={page} value={page} disabled={currentPage === page}>
+          <option key={page} value={page}>
             {page} / {maxPage}
           </option>
         ))}

@@ -11,12 +11,10 @@ export default function LangSwitch() {
 
   return (
     <div className="dropdown dropdown-end">
-      {/* biome-ignore lint/a11y/useSemanticElements: <explanation> */}
-      <div tabIndex={0} role="button" className="m-1">
+      <button type="button" tabIndex={0} className="btn btn-ghost m-1" aria-label="Change language">
         <SwitchIcon />
-      </div>
+      </button>
       <ul
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: <explanation>
         tabIndex={0}
         className="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52"
       >

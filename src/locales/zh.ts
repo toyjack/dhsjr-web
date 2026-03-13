@@ -50,6 +50,8 @@ export default {
   character_id:"单字ID",
   show_all_records_of_this_book:"显示此资料的所有记录",
   searchConditionRequired:"未指定搜索条件。",
+  searchError:"搜索时发生错误，请更换条件后重试。",
+  noResults:"未找到匹配的数据。",
   character_not_found:"未找到单字",
   all_books_list:"文献资料一览",
   book_name:"文献名称",
