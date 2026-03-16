@@ -46,6 +46,7 @@ export default async function ResultPage(props: ResultPageProps) {
       );
     }
   } catch (e) {
+    console.error("Search error:", e);
     return (
       <div className="alert alert-error m-4">
         <span>{t("searchError")}</span>

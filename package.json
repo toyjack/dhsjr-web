@@ -10,7 +10,8 @@
     "data:update": "tsx scripts/update-data.ts",
     "data:gen-book": "tsx scripts/gen-book.ts",
     "supabase": "supabase",
-    "gen:types": "supabase gen types typescript --project-id uubujwfsfcihyfyeoszd > .\\src\\types\\supabase.type.ts"
+    "gen:types": "supabase gen types typescript --project-id uubujwfsfcihyfyeoszd > .\\src\\types\\supabase.type.ts",
+    "supabase:gen": "source .env && supabase gen types typescript --db-url ${SUPABASE_DB_URL} --schema public > src/types/supabase.type.ts"
   },
   "dependencies": {
     "@next/third-parties": "16.0.0",

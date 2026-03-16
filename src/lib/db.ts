@@ -5,13 +5,10 @@ import { supabase } from "./supabase";
 const PAGE = 1;
 const PER_PAGE = 100;
 
-type BookListRow = { 資料番号: string; 資料名: string };
-
 export async function getBookList() {
-  const { data, error } = await (supabase as any)
-    .from("book_list_dhsjr")
-    .select("*")
-    .order("資料番号", { ascending: true }) as { data: BookListRow[] | null; error: any };
+  const { data, error } = await (supabase)
+    .rpc("get_dhsjr_books")
+
 
   if (error) {
     throw new Error(`Failed to fetch book list: ${error.message}`);
@@ -25,8 +22,8 @@ export async function getBookList() {
   const uniqueBooks = Array.from(
     new Map(
       data.map((item) => [
-        item.資料番号.split("-").slice(0,2).join("-"),
-        { book_id: item.資料番号.split("-").slice(0,2).join("-"), book_name: item.資料名 },
+        item.資料番号.split("-").slice(0, 2).join("-"),
+        { book_id: item.資料番号.split("-").slice(0, 2).join("-"), book_name: item.資料名 },
       ])
     ).values()
   );
@@ -35,17 +32,14 @@ export async function getBookList() {
 }
 
 export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
-  const query = (supabase as any)
-    .rpc("search_dhsjr_by_word", { 
-      search_query: term, 
-      page_number: page, 
+  const { data, error } = await (supabase)
+    .rpc("search_dhsjr_all_fields_by_word", {
+      search_query: term,
+      page_number: page,
       page_size: perPage
-     });
+    });
 
-  const { data, error } = await query;
-
-  const queryCount = (supabase as any).rpc("count_dhsjr_by_word", { search_query: term });
-  const { data: count, error: countError } = await queryCount;
+  const { data: count, error: countError } = await (supabase).rpc("count_dhsjr_all_fields_by_word", { search_query: term });
 
   if (error || countError) {
     throw new Error(`Search failed: ${error?.message || countError?.message}`);
