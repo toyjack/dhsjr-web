@@ -1,5 +1,6 @@
 import type { BookList, Inputs, SearchResults } from "@/types";
 import { FIELD_TO_COLUMN, rowToDhsjr } from "./field-mapping";
+import { getBookList as getStaticBookList } from "./books";
 import { supabase } from "./supabase";
 
 const PAGE = 1;
@@ -55,29 +56,7 @@ async function searchAllFallback(term: string, page: number, perPage: number) {
 }
 
 export async function getBookList() {
-  const { data, error } = await (supabase)
-    .rpc("get_dhsjr_books")
-
-
-  if (error) {
-    throw new Error(`Failed to fetch book list: ${error.message}`);
-  }
-
-  if (!data) {
-    return [] as BookList;
-  }
-
-  // Remove duplicates manually since Supabase doesn't have groupBy
-  const uniqueBooks = Array.from(
-    new Map(
-      data.map((item) => [
-        item.資料番号.split("-").slice(0, 2).join("-"),
-        { book_id: item.資料番号.split("-").slice(0, 2).join("-"), book_name: item.資料名 },
-      ])
-    ).values()
-  );
-
-  return uniqueBooks as BookList;
+  return getStaticBookList();
 }
 
 export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {

@@ -55,6 +55,10 @@ export const ALL_MANIFEST = [
     manifest: "https://dl.ndl.go.jp/api/iiif/3438692/manifest.json",
   },
   {
+    book_id: "40-060-01",
+    manifest:"https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00007929/manifest.json",
+  },
+  {
     book_id: "50-007-04",
     manifest: "https://dl.ndl.go.jp/api/iiif/2532240/manifest.json",
   },
@@ -66,6 +70,10 @@ export const ALL_MANIFEST = [
     book_id: "50-035-01",
     manifest:
       "https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00008057/manifest.json",
+  },
+  {
+    book_id: "50-035-02",
+    manifest:"https://da.library.ryukoku.ac.jp/iiif/130001/1/manifest.json",
   },
   {
     book_id: "50-047-01",
