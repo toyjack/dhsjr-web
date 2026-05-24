@@ -178,3 +178,24 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
     data: convertedData,
   } as SearchResults;
 }
+
+export async function getWord(bookId:string,wordIndexInBook:number) {
+  const word=await supabase.from("dhsjr").select("*").eq(FIELD_TO_COLUMN.book_id, bookId).eq(FIELD_TO_COLUMN.word_index_in_book, wordIndexInBook).limit(1).single();
+
+  return word;
+}
+
+export async function getWordRecords(bookId: string, wordIndexInBook: string) {
+  const { data, error } = await supabase
+    .from("dhsjr")
+    .select("*")
+    .eq(FIELD_TO_COLUMN.book_id, bookId)
+    .eq(FIELD_TO_COLUMN.word_index_in_book, wordIndexInBook)
+    .order(FIELD_TO_COLUMN.index_in_book, { ascending: true });
+
+  if (error) {
+    throw new Error(`Failed to fetch word: ${error.message}`);
+  }
+
+  return data ? data.map(rowToDhsjr) : [];
+}

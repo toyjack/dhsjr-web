@@ -80,12 +80,12 @@ export default function ResultsTable({ data }: { data: Dhsjr[] }) {
                 />
               </td>
               <td className="text-2xl">
-                {/* TODO word's id  */}
-                {/* <Link href={`/word/${row.book_id}-${row.word_index_in_book}`}> */}
                 <RubyCell
                   baseText={row.word}
                   rubyTop={row.shoten_word}
                   rubyBottom={row.word_kana}
+                  // TODO word's id
+                  href={localePath(`/word/${row.book_id}_${row.word_index_in_book}`,locale)}
                 />
                 {/* </Link> */}
               </td>
