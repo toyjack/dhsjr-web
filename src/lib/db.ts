@@ -5,6 +5,55 @@ import { supabase } from "./supabase";
 const PAGE = 1;
 const PER_PAGE = 100;
 
+const GLOBAL_SEARCH_COLUMNS = [
+  FIELD_TO_COLUMN.character,
+  FIELD_TO_COLUMN.word,
+  FIELD_TO_COLUMN.kana,
+  FIELD_TO_COLUMN.word_kana,
+  FIELD_TO_COLUMN.shoten,
+  FIELD_TO_COLUMN.shoten_word,
+  FIELD_TO_COLUMN.book_name,
+  FIELD_TO_COLUMN.word_alphabet,
+  FIELD_TO_COLUMN.word_type,
+  FIELD_TO_COLUMN.fanqie,
+  FIELD_TO_COLUMN.ruion,
+  FIELD_TO_COLUMN.etc,
+  FIELD_TO_COLUMN.notes,
+];
+
+function shouldFallbackGlobalSearch(errorMessage: string) {
+  return (
+    errorMessage.includes("operator does not exist: text &@~ text") ||
+    errorMessage.includes("function search_dhsjr_all_fields_by_word") ||
+    errorMessage.includes("function count_dhsjr_all_fields_by_word")
+  );
+}
+
+async function searchAllFallback(term: string, page: number, perPage: number) {
+  const wildcard = `%${term}%`;
+  const orFilter = GLOBAL_SEARCH_COLUMNS.map((column) => `${column}.ilike.${wildcard}`).join(",");
+
+  const { data, count, error } = await supabase
+    .from("dhsjr")
+    .select("*", { count: "exact" })
+    .or(orFilter)
+    .range((page - 1) * perPage, page * perPage - 1);
+
+  if (error) {
+    throw new Error(`Search failed: ${error.message}`);
+  }
+
+  return {
+    meta: {
+      query: { term },
+      count: count || 0,
+      page,
+      perPage,
+    },
+    data: data ? data.map(rowToDhsjr) : [],
+  } as SearchResults;
+}
+
 export async function getBookList() {
   const { data, error } = await (supabase)
     .rpc("get_dhsjr_books")
@@ -42,7 +91,14 @@ export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
   const { data: count, error: countError } = await (supabase).rpc("count_dhsjr_all_fields_by_word", { search_query: term });
 
   if (error || countError) {
-    throw new Error(`Search failed: ${error?.message || countError?.message}`);
+    const errorMessage = error?.message || countError?.message || "Unknown error";
+
+    // Graceful fallback when PGroonga operator/functions are unavailable.
+    if (shouldFallbackGlobalSearch(errorMessage)) {
+      return searchAllFallback(term, page, perPage);
+    }
+
+    throw new Error(`Search failed: ${errorMessage}`);
   }
 
   // Convert rows to Dhsjr format
