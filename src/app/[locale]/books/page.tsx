@@ -36,8 +36,8 @@ export default async function BooksPage(
             </tr>
           </thead>
           <tbody>
-            {allBooks.map((book,index) => (
-              <tr key={book.book_id+index} className="hover:bg-base-300">
+            {allBooks.map((book) => (
+              <tr key={book.book_id} className="hover:bg-base-300">
                 <td><Link href={localePath(`/book/${book.book_id}`, params.locale)}>{book.book_id}</Link></td>
                 <td><Link href={localePath(`/book/${book.book_id}`, params.locale)}>{book.book_name}</Link></td>
                 <td>{hasManifest(book.book_id) ? t("iiif_yes") : t("iiif_no")}</td>

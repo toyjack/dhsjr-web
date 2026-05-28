@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import Books from "../../contents/books.json";
 import { BookList } from "@/types";
 
@@ -15,13 +14,6 @@ export interface BookData {
   }
 
 export async function getBookData(bookId: string) {
-  // const filename = `${process.cwd()}/contents/books/${bookId}.md`;
-  // if (!fs.existsSync(filename)) {
-  //   return null;
-  // }
-  // const bookContents = fs.readFileSync(filename, "utf-8");
-
-  // return bookContents;
   const books = Books as BookData[];
   const book = books.find((b) => b.id === bookId);
   if (!book) {
