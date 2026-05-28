@@ -132,7 +132,7 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
     query = query.ilike(FIELD_TO_COLUMN.notes, `%${params.notes}%`);
   }
   if (params.book_id) {
-    query = query.ilike(FIELD_TO_COLUMN.book_id, `${params.book_id}%`);
+    query = query.eq(FIELD_TO_COLUMN.book_id, params.book_id);
   }
 
   // Apply pagination

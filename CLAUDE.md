@@ -16,7 +16,8 @@ This is a multilingual web application for searching Japanese character and word
 
 ### Data Management Scripts
 - `pnpm data:update` - Import/update character data from TSV files in `contents/data/`
-- `pnpm data:gen-book` - Generate `contents/books.json` from `contents/Bibliography_20240515.md`
+- `pnpm data:gen-book` - Generate `contents/books.json` from `contents/Bibliography.md`
+- `pnpm supabase:gen` - Regenerate TypeScript types from database schema into `src/types/supabase.type.ts`
 
 ## Architecture
 
@@ -28,45 +29,44 @@ This is a multilingual web application for searching Japanese character and word
 - **State Management**: Jotai
 - **Internationalization**: next-international (ja/en/zh locales)
 - **Package Manager**: pnpm
-- **Code Quality**: Biome (linting + formatting)
+- **Code Quality**: ESLint (linting via `pnpm lint`) + Biome (formatting, import organization)
 
 ### Database Architecture
 
-The application uses a single table `dhsjr` that stores character and word phonetic data. Key fields include:
+The primary table is `dhsjr`, which stores character and word phonetic data. Key fields include:
 - Character information: `character`, `character_original`, `character_id`
 - Word information: `word`, `word_original`, `word_alphabet`
 - Phonetic annotations: `kana`, `shoten`, `fanqie`, `ruion`, `word_kana`, `shoten_word`
 - Book metadata: `book_id`, `book_name`, `index_in_book`
 - Additional fields: `word_type`, `pos_in_word`, `hakase`, `etc`, `notes`
 
+Additional tables in the database: `jyobatsu_records`, `kanseki_records`, `normalizations`, `racvyoxv_shogyokuhen`, `tsj_wakun`.
+
 Database connection is managed through a singleton Supabase client in [src/lib/supabase.ts](src/lib/supabase.ts) to prevent connection exhaustion in development.
 
-Type definitions for the database schema are in [src/types/database.ts](src/types/database.ts), including the `Database` interface and `Dhsjr` type.
+Generated TypeScript types for the database schema are in [src/types/supabase.type.ts](src/types/supabase.type.ts), including the `Database` interface. Run `pnpm supabase:gen` to regenerate after schema changes.
+
+The `Dhsjr` interface (English field names) and column mapping utilities are in [src/lib/field-mapping.ts](src/lib/field-mapping.ts):
+- `Dhsjr` - Interface with English field names for app use
+- `DhsjrRow` - Raw database row type (Japanese column names)
+- `FIELD_TO_COLUMN` / `COLUMN_TO_FIELD` - Bidirectional English↔Japanese name maps
+- `rowToDhsjr()` / `dhsjrToRow()` - Conversion functions between the two representations
 
 ### Search System
 
 Search functions in [src/lib/db.ts](src/lib/db.ts):
 
-**Basic Search:**
-1. **getBookList()** - Get list of all unique books
-2. **searchAll()** - Global search across all text fields using `ilike` for case-insensitive matching
-3. **search()** - Detailed search allowing field-specific filtering via `Inputs` type
-
-**PGroonga Full-Text Search (Recommended for Japanese text):**
-4. **fullTextSearch()** - Advanced full-text search using PGroonga extension via RPC
-   - Supports complex queries: OR, AND, -, *, phrase search
-   - Returns results sorted by relevance score
-   - Optimized for Japanese text
-5. **searchField()** - Search in specific field using PGroonga
-6. **fts()** - Legacy function (uses fullTextSearch internally)
+1. **getBookList()** - Returns static book list from `contents/books.json`
+2. **searchAll(term, page, perPage)** - Global search using PGroonga RPC (`search_dhsjr_all_fields_by_word`), with automatic fallback to `ilike` if PGroonga is unavailable
+3. **search(params, page, perPage)** - Detailed search with field-specific `ilike` filtering via `Inputs` type
+4. **getWord(bookId, wordIndexInBook)** - Fetch a single word record by book ID and word index
+5. **getWordRecords(bookId, wordIndexInBook)** - Fetch all character records for a word, ordered by `index_in_book`
 
 All search functions support pagination with configurable `page` and `perPage` parameters.
 
 **PGroonga Setup:**
 - SQL setup: [supabase/functions/full_text_search.sql](supabase/functions/full_text_search.sql)
 - Documentation: [README_PGROONGA.md](README_PGROONGA.md)
-- Quick start: [docs/SETUP_STEPS.md](docs/SETUP_STEPS.md)
-- Examples: [docs/pgroonga-examples.md](docs/pgroonga-examples.md)
 
 ### Internationalization
 
@@ -97,6 +97,10 @@ Book metadata is stored in `contents/books.json` and accessed via [src/lib/books
 - `getAllBooksFileNameList()` - Get all book IDs
 
 Book data structure includes: id, title, age, owner, pictures, guide, information, inputor, bibs.
+
+### IIIF Manifest Mapping
+
+[contents/manifest.ts](contents/manifest.ts) exports `ALL_MANIFEST` — a static list of `{ book_id, manifest }` objects mapping `book_id` values to their IIIF manifest URLs. Used in book and word detail pages to conditionally show the IIIF viewer icon.
 
 ### IIIF Viewers
 
@@ -132,8 +136,9 @@ Use `@/` prefix for imports from `src/` directory (configured in [tsconfig.json]
 ### TypeScript
 - Strict mode enabled
 - Use explicit types from [src/types.ts](src/types.ts): `Inputs`, `BookList`, `SearchResults`
-- Database types imported from `@/types/database`
-- The `Dhsjr` type represents a row in the dhsjr table
+- Generated database types imported from `@/types/supabase.type`
+- `Dhsjr` interface (English field names) imported from `@/lib/field-mapping`
+- Always use `rowToDhsjr()` from `@/lib/field-mapping` to convert raw database rows to `Dhsjr`
 
 ### Styling
 - Use Tailwind utility classes
@@ -148,11 +153,9 @@ When running `data:update`:
 - Processes data in batches of 100 using Supabase `upsert` operations
 - Uses `onConflict: "character_id"` to handle both new and existing records
 
-### Biome Configuration
-- Formatter: 2-space indentation
-- Linter: Recommended rules for React and Next.js
-- Auto-organizes imports on save
-- Run `pnpm lint` to check code quality
+### Code Quality
+- `pnpm lint` runs ESLint (eslint-config-next)
+- Biome handles formatting (2-space indentation) and import organization; configured in `biome.json`
 
 ## Database Environment Variables
 
