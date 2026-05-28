@@ -36,7 +36,7 @@ export async function getBookList(): Promise<BookList> {
   return books.map((b) => ({
     book_id: b.id,
     book_name: b.title,
-  }));
+  })).sort((a, b) => a.book_id.localeCompare(b.book_id));
 }
 
 export async function getAllBooksFileNameList() {
