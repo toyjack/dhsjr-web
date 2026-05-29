@@ -21,11 +21,6 @@ export type Inputs = {
   notes: string;
 };
 
-export type BookList={
-  book_id: string;
-  book_name: string;
-}[]
-
 export type SearchResults = {
   meta: {
     query: { 

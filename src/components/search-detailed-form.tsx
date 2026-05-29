@@ -1,6 +1,6 @@
 "use client";
 
-import type { BookList, Inputs } from "@/types";
+import type {  Inputs } from "@/types";
 import { useRouter } from "next/navigation";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import TextInput from "./text-input";
@@ -12,7 +12,7 @@ import type { KeyboardEvent } from "react";
 export default function SearchDetailedForm({
   bookList,
 }: {
-  bookList: BookList;
+  bookList: { book_id: string; title: string|null }[];
 }) {
   const t = useI18n();
   const router = useRouter();
@@ -85,7 +85,7 @@ export default function SearchDetailedForm({
             {bookList.map((book) => {
               return (
                 <option key={book.book_id} value={book.book_id}>
-                  {book.book_id} {book.book_name}
+                  {book.book_id} {book.title}
                 </option>
               );
             })}

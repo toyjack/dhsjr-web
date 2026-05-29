@@ -1,4 +1,4 @@
-import type { BookList, Inputs, SearchResults } from "@/types";
+import type {  Inputs, SearchResults } from "@/types";
 import { FIELD_TO_COLUMN, rowToDhsjr } from "./field-mapping";
 import { getBookList as getStaticBookList } from "./books";
 import { supabase } from "./supabase";

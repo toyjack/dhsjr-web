@@ -1,4 +1,3 @@
-import React from "react";
 import SearchDetailedForm from "./search-detailed-form";
 import SearchAllForm from "./search-all-form";
 import { getI18n } from "@/locales/server";

@@ -1,5 +1,4 @@
 import { getBookData } from "@/lib/books";
-import ReactMarkdown from "react-markdown";
 import { ALL_MANIFEST } from "../../../../../contents/manifest";
 import dynamic from "next/dynamic";
 import SearchWordInBookBtn from "@/components/search-word-in-book-btn";
@@ -38,35 +37,40 @@ export default async function BookPage(props: BookPageProps) {
       <div className="prose prose-sm md:prose-base w-full max-w-4xl flex-grow pt-10">
         <h1>{bookData.title}</h1>
         <h2>
-          {t("age")}: {bookData.age}
+          {t("age")}: {bookData.period}
         </h2>
         <h3>
-          {t("owner")}: {bookData.owner}
+          {t("owner")}: {bookData.holding_institution}
         </h3>
         <h3>
-          {t("inputor")}: {bookData.inputor}
+          {t("inputor")}: {bookData.input_responsible}
         </h3>
 
         <div className="divider" />
         <h3>
           {t("pictures")}
         </h3>
-          <ReactMarkdown>{bookData.pictures.join(", ")}</ReactMarkdown>
+          {/* <ReactMarkdown>{bookData.pictures.join(", ")}</ReactMarkdown> */}
+          {bookData.image_info?.map((imgInfo) => (
+            <div key={`imgInfo-${imgInfo}`}>
+              <p>{imgInfo}</p>
+            </div>
+          ))}
         <div className="divider" />
 
         <h3>{t("guides")}</h3>
-        {bookData.guide.map((g, index) => (
+        {bookData.input_notes?.map((g, index) => (
           <p key={`guide-${index}-${g}`}>{g}</p>
         ))}
         <div className="divider" />
 
         <h3>{t("informations")}</h3>
-        {bookData.information.map((info, index) => (
+        {bookData.phonetic_info?.map((info, index) => (
           <p key={`info-${index}-${info}`}>{info}</p>
         ))}
         <div className="divider" />
         <h3>{t("bibs")}</h3>
-        {bookData.bibs.map((bib, index) => (
+        {bookData.references_raw?.map((bib, index) => (
           <p key={`bib-${index}-${bib}`}>{bib}</p>
         ))}
         
