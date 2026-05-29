@@ -9,6 +9,102 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      Account: {
+        Row: {
+          id: string
+          provider: string | null
+          providerAccountId: string | null
+          userId: string | null
+        }
+        Insert: {
+          id: string
+          provider?: string | null
+          providerAccountId?: string | null
+          userId?: string | null
+        }
+        Update: {
+          id?: string
+          provider?: string | null
+          providerAccountId?: string | null
+          userId?: string | null
+        }
+        Relationships: []
+      }
+      BunmeiSetsuyoshu: {
+        Row: {
+          bu: string | null
+          bunmei_id: string | null
+          definition: string | null
+          entry: string | null
+          entry_original: string | null
+          gokei: string | null
+          gokei_original: string | null
+          gotou: string | null
+          id: number
+          item_type: string | null
+          left_kun: string | null
+          left_kun_original: string | null
+          line: number | null
+          mon: string | null
+          ndl_comma: string | null
+          ndl_link: string | null
+          no_inline: number | null
+          page: number | null
+          remark: string | null
+          revision: string | null
+          shoten: string | null
+          shoten_original: string | null
+        }
+        Insert: {
+          bu?: string | null
+          bunmei_id?: string | null
+          definition?: string | null
+          entry?: string | null
+          entry_original?: string | null
+          gokei?: string | null
+          gokei_original?: string | null
+          gotou?: string | null
+          id: number
+          item_type?: string | null
+          left_kun?: string | null
+          left_kun_original?: string | null
+          line?: number | null
+          mon?: string | null
+          ndl_comma?: string | null
+          ndl_link?: string | null
+          no_inline?: number | null
+          page?: number | null
+          remark?: string | null
+          revision?: string | null
+          shoten?: string | null
+          shoten_original?: string | null
+        }
+        Update: {
+          bu?: string | null
+          bunmei_id?: string | null
+          definition?: string | null
+          entry?: string | null
+          entry_original?: string | null
+          gokei?: string | null
+          gokei_original?: string | null
+          gotou?: string | null
+          id?: number
+          item_type?: string | null
+          left_kun?: string | null
+          left_kun_original?: string | null
+          line?: number | null
+          mon?: string | null
+          ndl_comma?: string | null
+          ndl_link?: string | null
+          no_inline?: number | null
+          page?: number | null
+          remark?: string | null
+          revision?: string | null
+          shoten?: string | null
+          shoten_original?: string | null
+        }
+        Relationships: []
+      }
       dhsjr: {
         Row: {
           ID: string
@@ -84,6 +180,237 @@ export type Database = {
           資料名?: string | null
           資料番号?: string | null
           類音?: string | null
+        }
+        Relationships: []
+      }
+      "dhsjr-books": {
+        Row: {
+          book_id: string
+          git_commit: string | null
+          heading: string | null
+          holding_institution: string | null
+          image_info: string[] | null
+          imported_at: string | null
+          input_notes: string[] | null
+          input_responsible: string[] | null
+          other: string[] | null
+          parse_status: string
+          parse_warnings: Json
+          period: string | null
+          phonetic_info: string[] | null
+          raw_markdown: string
+          references_parsed: Json | null
+          references_raw: string[] | null
+          source_file: string | null
+          source_hash: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          book_id: string
+          git_commit?: string | null
+          heading?: string | null
+          holding_institution?: string | null
+          image_info?: string[] | null
+          imported_at?: string | null
+          input_notes?: string[] | null
+          input_responsible?: string[] | null
+          other?: string[] | null
+          parse_status?: string
+          parse_warnings?: Json
+          period?: string | null
+          phonetic_info?: string[] | null
+          raw_markdown: string
+          references_parsed?: Json | null
+          references_raw?: string[] | null
+          source_file?: string | null
+          source_hash?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          book_id?: string
+          git_commit?: string | null
+          heading?: string | null
+          holding_institution?: string | null
+          image_info?: string[] | null
+          imported_at?: string | null
+          input_notes?: string[] | null
+          input_responsible?: string[] | null
+          other?: string[] | null
+          parse_status?: string
+          parse_warnings?: Json
+          period?: string | null
+          phonetic_info?: string[] | null
+          raw_markdown?: string
+          references_parsed?: Json | null
+          references_raw?: string[] | null
+          source_file?: string | null
+          source_hash?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      Gyokuhentaizen: {
+        Row: {
+          entry: string | null
+          ghtz_id: string | null
+          id: number
+          ids: string | null
+          jion_l: string | null
+          jion_r: string | null
+          radical: string | null
+          remain_strokes: string | null
+          wakun: string | null
+        }
+        Insert: {
+          entry?: string | null
+          ghtz_id?: string | null
+          id: number
+          ids?: string | null
+          jion_l?: string | null
+          jion_r?: string | null
+          radical?: string | null
+          remain_strokes?: string | null
+          wakun?: string | null
+        }
+        Update: {
+          entry?: string | null
+          ghtz_id?: string | null
+          id?: number
+          ids?: string | null
+          jion_l?: string | null
+          jion_r?: string | null
+          radical?: string | null
+          remain_strokes?: string | null
+          wakun?: string | null
+        }
+        Relationships: []
+      }
+      Hzwm: {
+        Row: {
+          createdAt: string | null
+          definition: string | null
+          entry: string | null
+          id: string
+          location: string | null
+          readings: string | null
+          type: string | null
+          updatedAt: string | null
+        }
+        Insert: {
+          createdAt?: string | null
+          definition?: string | null
+          entry?: string | null
+          id: string
+          location?: string | null
+          readings?: string | null
+          type?: string | null
+          updatedAt?: string | null
+        }
+        Update: {
+          createdAt?: string | null
+          definition?: string | null
+          entry?: string | null
+          id?: string
+          location?: string | null
+          readings?: string | null
+          type?: string | null
+          updatedAt?: string | null
+        }
+        Relationships: []
+      }
+      Jiruisho: {
+        Row: {
+          bu: string | null
+          char_count: number | null
+          definition: string | null
+          entry: string | null
+          entry_expression: string | null
+          gokei_display: string | null
+          gokei_search_current: string | null
+          gokei_search_original: string | null
+          hen: string | null
+          id: number
+          kurokawa_loc: string | null
+          kurokawa_ndl_url: string | null
+          maeda_loc: string | null
+          maeda_ndl_url: string | null
+          onkun: string | null
+          remark: string | null
+          shouten: string | null
+        }
+        Insert: {
+          bu?: string | null
+          char_count?: number | null
+          definition?: string | null
+          entry?: string | null
+          entry_expression?: string | null
+          gokei_display?: string | null
+          gokei_search_current?: string | null
+          gokei_search_original?: string | null
+          hen?: string | null
+          id: number
+          kurokawa_loc?: string | null
+          kurokawa_ndl_url?: string | null
+          maeda_loc?: string | null
+          maeda_ndl_url?: string | null
+          onkun?: string | null
+          remark?: string | null
+          shouten?: string | null
+        }
+        Update: {
+          bu?: string | null
+          char_count?: number | null
+          definition?: string | null
+          entry?: string | null
+          entry_expression?: string | null
+          gokei_display?: string | null
+          gokei_search_current?: string | null
+          gokei_search_original?: string | null
+          hen?: string | null
+          id?: number
+          kurokawa_loc?: string | null
+          kurokawa_ndl_url?: string | null
+          maeda_loc?: string | null
+          maeda_ndl_url?: string | null
+          onkun?: string | null
+          remark?: string | null
+          shouten?: string | null
+        }
+        Relationships: []
+      }
+      JiruishoChushaku: {
+        Row: {
+          annotation: string | null
+          bu: string | null
+          hen: string | null
+          id: number
+          jiruisho_id: number | null
+          maki: string | null
+          word_in_kurokawa: string | null
+          word_in_maeda: string | null
+        }
+        Insert: {
+          annotation?: string | null
+          bu?: string | null
+          hen?: string | null
+          id: number
+          jiruisho_id?: number | null
+          maki?: string | null
+          word_in_kurokawa?: string | null
+          word_in_maeda?: string | null
+        }
+        Update: {
+          annotation?: string | null
+          bu?: string | null
+          hen?: string | null
+          id?: number
+          jiruisho_id?: number | null
+          maki?: string | null
+          word_in_kurokawa?: string | null
+          word_in_maeda?: string | null
         }
         Relationships: []
       }
@@ -216,6 +543,111 @@ export type Database = {
         }
         Relationships: []
       }
+      "nk-gaiji": {
+        Row: {
+          "【旧】大辞泉GIF": string | null
+          "【旧】大辞泉コード": string | null
+          JK: string | null
+          NDK書体名: string | null
+          Shift_JIS: string | null
+          エンティティ: string | null
+          ニッポニカ: string | null
+          仮ユニコード: string | null
+          備考: string | null
+          外字ID: string
+          大辞泉: string | null
+          大辞泉GIF: string | null
+          大辞泉コード: string | null
+          新外字コード: string | null
+          日国: string | null
+          日国fontコード: string | null
+          日国コード: string | null
+          検索ユニコード: string | null
+          標準書体: string | null
+          百科GIF: string | null
+          百科コード: string | null
+          百科私的領域: string | null
+          種別: string | null
+          総画数: string | null
+          置換ユニコード: string | null
+          訓読み: string | null
+          "訓読み（ローマ字）": string | null
+          "部首・部首内画数": string | null
+          重複: string | null
+          非HTMLエンティティ: string | null
+          音読み: string | null
+          "音読み（ローマ字）": string | null
+        }
+        Insert: {
+          "【旧】大辞泉GIF"?: string | null
+          "【旧】大辞泉コード"?: string | null
+          JK?: string | null
+          NDK書体名?: string | null
+          Shift_JIS?: string | null
+          エンティティ?: string | null
+          ニッポニカ?: string | null
+          仮ユニコード?: string | null
+          備考?: string | null
+          外字ID: string
+          大辞泉?: string | null
+          大辞泉GIF?: string | null
+          大辞泉コード?: string | null
+          新外字コード?: string | null
+          日国?: string | null
+          日国fontコード?: string | null
+          日国コード?: string | null
+          検索ユニコード?: string | null
+          標準書体?: string | null
+          百科GIF?: string | null
+          百科コード?: string | null
+          百科私的領域?: string | null
+          種別?: string | null
+          総画数?: string | null
+          置換ユニコード?: string | null
+          訓読み?: string | null
+          "訓読み（ローマ字）"?: string | null
+          "部首・部首内画数"?: string | null
+          重複?: string | null
+          非HTMLエンティティ?: string | null
+          音読み?: string | null
+          "音読み（ローマ字）"?: string | null
+        }
+        Update: {
+          "【旧】大辞泉GIF"?: string | null
+          "【旧】大辞泉コード"?: string | null
+          JK?: string | null
+          NDK書体名?: string | null
+          Shift_JIS?: string | null
+          エンティティ?: string | null
+          ニッポニカ?: string | null
+          仮ユニコード?: string | null
+          備考?: string | null
+          外字ID?: string
+          大辞泉?: string | null
+          大辞泉GIF?: string | null
+          大辞泉コード?: string | null
+          新外字コード?: string | null
+          日国?: string | null
+          日国fontコード?: string | null
+          日国コード?: string | null
+          検索ユニコード?: string | null
+          標準書体?: string | null
+          百科GIF?: string | null
+          百科コード?: string | null
+          百科私的領域?: string | null
+          種別?: string | null
+          総画数?: string | null
+          置換ユニコード?: string | null
+          訓読み?: string | null
+          "訓読み（ローマ字）"?: string | null
+          "部首・部首内画数"?: string | null
+          重複?: string | null
+          非HTMLエンティティ?: string | null
+          音読み?: string | null
+          "音読み（ローマ字）"?: string | null
+        }
+        Relationships: []
+      }
       normalizations: {
         Row: {
           normalized: string | null
@@ -228,6 +660,96 @@ export type Database = {
         Update: {
           normalized?: string | null
           target?: string | null
+        }
+        Relationships: []
+      }
+      Racvyoxv: {
+        Row: {
+          bu: string | null
+          entry: string | null
+          entry_length: number | null
+          gallica: string | null
+          gokei: string | null
+          id: string
+          kun: string | null
+          line: number | null
+          nikkoku1_entry: string | null
+          nikkoku1_url: string | null
+          nikkoku2_entry: string | null
+          nikkoku2_url: string | null
+          nikkoku3_entry: string | null
+          nikkoku3_url: string | null
+          nikkoku4_entry: string | null
+          nikkoku4_url: string | null
+          nikkoku5_entry: string | null
+          nikkoku5_url: string | null
+          nikkoku6_entry: string | null
+          nikkoku6_url: string | null
+          nikkoku7_entry: string | null
+          nikkoku7_url: string | null
+          nikkoku8_entry: string | null
+          nikkoku8_url: string | null
+          on: string | null
+          page: number | null
+          remark: string | null
+        }
+        Insert: {
+          bu?: string | null
+          entry?: string | null
+          entry_length?: number | null
+          gallica?: string | null
+          gokei?: string | null
+          id: string
+          kun?: string | null
+          line?: number | null
+          nikkoku1_entry?: string | null
+          nikkoku1_url?: string | null
+          nikkoku2_entry?: string | null
+          nikkoku2_url?: string | null
+          nikkoku3_entry?: string | null
+          nikkoku3_url?: string | null
+          nikkoku4_entry?: string | null
+          nikkoku4_url?: string | null
+          nikkoku5_entry?: string | null
+          nikkoku5_url?: string | null
+          nikkoku6_entry?: string | null
+          nikkoku6_url?: string | null
+          nikkoku7_entry?: string | null
+          nikkoku7_url?: string | null
+          nikkoku8_entry?: string | null
+          nikkoku8_url?: string | null
+          on?: string | null
+          page?: number | null
+          remark?: string | null
+        }
+        Update: {
+          bu?: string | null
+          entry?: string | null
+          entry_length?: number | null
+          gallica?: string | null
+          gokei?: string | null
+          id?: string
+          kun?: string | null
+          line?: number | null
+          nikkoku1_entry?: string | null
+          nikkoku1_url?: string | null
+          nikkoku2_entry?: string | null
+          nikkoku2_url?: string | null
+          nikkoku3_entry?: string | null
+          nikkoku3_url?: string | null
+          nikkoku4_entry?: string | null
+          nikkoku4_url?: string | null
+          nikkoku5_entry?: string | null
+          nikkoku5_url?: string | null
+          nikkoku6_entry?: string | null
+          nikkoku6_url?: string | null
+          nikkoku7_entry?: string | null
+          nikkoku7_url?: string | null
+          nikkoku8_entry?: string | null
+          nikkoku8_url?: string | null
+          on?: string | null
+          page?: number | null
+          remark?: string | null
         }
         Relationships: []
       }
@@ -321,6 +843,99 @@ export type Database = {
         }
         Relationships: []
       }
+      "racvyoxv-dev": {
+        Row: {
+          "２字目": string | null
+          "3字目": string | null
+          "4字目": string | null
+          "5字目": string | null
+          GallicaURL: string | null
+          ID: string
+          "ページ数（笠間書院総索引／天理図書館善本叢": number | null
+          代表字: string | null
+          代表字頭記号: string | null
+          備考: string | null
+          文字数: number | null
+          篇名: string | null
+          行数: string | null
+          見出し語: string | null
+          "訓読み(左傍1字目)": string | null
+          "訓読み(左傍1字目補完)": string | null
+          "訓読み(左傍2字目)": string | null
+          "訓読み(左傍3字目)": string | null
+          "訓読み(左傍4字目)": string | null
+          "訓読み(左傍5字目)": string | null
+          "語形（音読み）": string | null
+          部: string | null
+          "音読み(右傍1字目)": string | null
+          "音読み(右傍1字目補完)": string | null
+          "音読み(右傍2字目)": string | null
+          "音読み(右傍3字目)": string | null
+          "音読み(右傍4字目)": string | null
+          "音読み(右傍5字目)": string | null
+        }
+        Insert: {
+          "２字目"?: string | null
+          "3字目"?: string | null
+          "4字目"?: string | null
+          "5字目"?: string | null
+          GallicaURL?: string | null
+          ID: string
+          "ページ数（笠間書院総索引／天理図書館善本叢"?: number | null
+          代表字?: string | null
+          代表字頭記号?: string | null
+          備考?: string | null
+          文字数?: number | null
+          篇名?: string | null
+          行数?: string | null
+          見出し語?: string | null
+          "訓読み(左傍1字目)"?: string | null
+          "訓読み(左傍1字目補完)"?: string | null
+          "訓読み(左傍2字目)"?: string | null
+          "訓読み(左傍3字目)"?: string | null
+          "訓読み(左傍4字目)"?: string | null
+          "訓読み(左傍5字目)"?: string | null
+          "語形（音読み）"?: string | null
+          部?: string | null
+          "音読み(右傍1字目)"?: string | null
+          "音読み(右傍1字目補完)"?: string | null
+          "音読み(右傍2字目)"?: string | null
+          "音読み(右傍3字目)"?: string | null
+          "音読み(右傍4字目)"?: string | null
+          "音読み(右傍5字目)"?: string | null
+        }
+        Update: {
+          "２字目"?: string | null
+          "3字目"?: string | null
+          "4字目"?: string | null
+          "5字目"?: string | null
+          GallicaURL?: string | null
+          ID?: string
+          "ページ数（笠間書院総索引／天理図書館善本叢"?: number | null
+          代表字?: string | null
+          代表字頭記号?: string | null
+          備考?: string | null
+          文字数?: number | null
+          篇名?: string | null
+          行数?: string | null
+          見出し語?: string | null
+          "訓読み(左傍1字目)"?: string | null
+          "訓読み(左傍1字目補完)"?: string | null
+          "訓読み(左傍2字目)"?: string | null
+          "訓読み(左傍3字目)"?: string | null
+          "訓読み(左傍4字目)"?: string | null
+          "訓読み(左傍5字目)"?: string | null
+          "語形（音読み）"?: string | null
+          部?: string | null
+          "音読み(右傍1字目)"?: string | null
+          "音読み(右傍1字目補完)"?: string | null
+          "音読み(右傍2字目)"?: string | null
+          "音読み(右傍3字目)"?: string | null
+          "音読み(右傍4字目)"?: string | null
+          "音読み(右傍5字目)"?: string | null
+        }
+        Relationships: []
+      }
       tsj_wakun: {
         Row: {
           def_manyogana: string | null
@@ -375,6 +990,114 @@ export type Database = {
         }
         Relationships: []
       }
+      User: {
+        Row: {
+          createdAt: string | null
+          email: string | null
+          id: string
+          name: string | null
+          password: string | null
+          role: string | null
+          updatedAt: string | null
+        }
+        Insert: {
+          createdAt?: string | null
+          email?: string | null
+          id: string
+          name?: string | null
+          password?: string | null
+          role?: string | null
+          updatedAt?: string | null
+        }
+        Update: {
+          createdAt?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          password?: string | null
+          role?: string | null
+          updatedAt?: string | null
+        }
+        Relationships: []
+      }
+      Wakunnosiori_Def: {
+        Row: {
+          definition: string | null
+          entry_id: number | null
+          id: number
+          index: number | null
+        }
+        Insert: {
+          definition?: string | null
+          entry_id?: number | null
+          id: number
+          index?: number | null
+        }
+        Update: {
+          definition?: string | null
+          entry_id?: number | null
+          id?: number
+          index?: number | null
+        }
+        Relationships: []
+      }
+      Wakunnosiori_Entry: {
+        Row: {
+          entry: string | null
+          id: number
+          location: string | null
+          ndl_url: string | null
+          page: string | null
+        }
+        Insert: {
+          entry?: string | null
+          id: number
+          location?: string | null
+          ndl_url?: string | null
+          page?: string | null
+        }
+        Update: {
+          entry?: string | null
+          id?: number
+          location?: string | null
+          ndl_url?: string | null
+          page?: string | null
+        }
+        Relationships: []
+      }
+      Wamyouruijyusho: {
+        Row: {
+          bu: string | null
+          definition: string | null
+          entry: string | null
+          id: number
+          maki: string | null
+          page: string | null
+          type: string | null
+          type2: string | null
+        }
+        Insert: {
+          bu?: string | null
+          definition?: string | null
+          entry?: string | null
+          id: number
+          maki?: string | null
+          page?: string | null
+          type?: string | null
+          type2?: string | null
+        }
+        Update: {
+          bu?: string | null
+          definition?: string | null
+          entry?: string | null
+          id?: number
+          maki?: string | null
+          page?: string | null
+          type?: string | null
+          type2?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -401,7 +1124,6 @@ export type Database = {
         Args: { page_number?: number; page_size?: number; search_query: string }
         Returns: {
           ID: string
-          score: number
           その他: string
           仮名型: string
           仮名注: string
