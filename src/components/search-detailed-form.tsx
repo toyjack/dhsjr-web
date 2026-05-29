@@ -52,9 +52,7 @@ export default function SearchDetailedForm({
       onKeyDown={(e) => handleKeyDown(e)}
       className="flex flex-col w-full md:p-2 gap-y-4"
     >
-      <p className="text-base text-base-content">
-        {t("advanced_search_description")}
-      </p>
+  
       {/* TODO divide 漢字　漢語 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextInput
