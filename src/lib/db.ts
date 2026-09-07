@@ -1,6 +1,6 @@
-import type {  Inputs, SearchResults } from "@/types";
-import { FIELD_TO_COLUMN, rowToDhsjr } from "./field-mapping";
+import type { Inputs, SearchResults } from "@/types";
 import { getBookList as getStaticBookList } from "./books";
+import { FIELD_TO_COLUMN, rowToDhsjr } from "./field-mapping";
 import { supabase } from "./supabase";
 
 const PAGE = 1;
@@ -32,7 +32,9 @@ function shouldFallbackGlobalSearch(errorMessage: string) {
 
 async function searchAllFallback(term: string, page: number, perPage: number) {
   const wildcard = `%${term}%`;
-  const orFilter = GLOBAL_SEARCH_COLUMNS.map((column) => `${column}.ilike.${wildcard}`).join(",");
+  const orFilter = GLOBAL_SEARCH_COLUMNS.map(
+    (column) => `${column}.ilike.${wildcard}`,
+  ).join(",");
 
   const { data, count, error } = await supabase
     .from("dhsjr")
@@ -60,17 +62,23 @@ export async function getBookList() {
 }
 
 export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
-  const { data, error } = await (supabase)
-    .rpc("search_dhsjr_all_fields_by_word", {
+  const { data, error } = await supabase.rpc(
+    "search_dhsjr_all_fields_by_word",
+    {
       search_query: term,
       page_number: page,
-      page_size: perPage
-    });
+      page_size: perPage,
+    },
+  );
 
-  const { data: count, error: countError } = await (supabase).rpc("count_dhsjr_all_fields_by_word", { search_query: term });
+  const { data: count, error: countError } = await supabase.rpc(
+    "count_dhsjr_all_fields_by_word",
+    { search_query: term },
+  );
 
   if (error || countError) {
-    const errorMessage = error?.message || countError?.message || "Unknown error";
+    const errorMessage =
+      error?.message || countError?.message || "Unknown error";
 
     // Graceful fallback when PGroonga operator/functions are unavailable.
     if (shouldFallbackGlobalSearch(errorMessage)) {
@@ -94,7 +102,11 @@ export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
   } as SearchResults;
 }
 
-export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
+export async function search(
+  params: Partial<Inputs>,
+  page = PAGE,
+  perPage = PER_PAGE,
+) {
   let query = supabase.from("dhsjr").select("*", { count: "exact" });
 
   // Apply filters using Japanese column names
@@ -158,8 +170,14 @@ export async function search(params: Inputs, page = PAGE, perPage = PER_PAGE) {
   } as SearchResults;
 }
 
-export async function getWord(bookId:string,wordIndexInBook:number) {
-  const word=await supabase.from("dhsjr").select("*").eq(FIELD_TO_COLUMN.book_id, bookId).eq(FIELD_TO_COLUMN.word_index_in_book, wordIndexInBook).limit(1).single();
+export async function getWord(bookId: string, wordIndexInBook: number) {
+  const word = await supabase
+    .from("dhsjr")
+    .select("*")
+    .eq(FIELD_TO_COLUMN.book_id, bookId)
+    .eq(FIELD_TO_COLUMN.word_index_in_book, wordIndexInBook)
+    .limit(1)
+    .single();
 
   return word;
 }

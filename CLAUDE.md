@@ -68,6 +68,17 @@ All search functions support pagination with configurable `page` and `perPage` p
 - SQL setup: [supabase/functions/full_text_search.sql](supabase/functions/full_text_search.sql)
 - Documentation: [README_PGROONGA.md](README_PGROONGA.md)
 
+### MCP Server
+
+A read-only MCP (Model Context Protocol) server is exposed as a Next.js route handler at `/api/mcp` (Streamable HTTP, via `mcp-handler` + `@modelcontextprotocol/server`). The i18n middleware already excludes `/api`.
+
+- Route: [src/app/api/mcp/route.ts](src/app/api/mcp/route.ts)
+- Tools/resources: [src/lib/mcp/register.ts](src/lib/mcp/register.ts) — `search_all`, `search_detail`, `list_books`, `get_book`, `get_word`, `get_character`, plus the `dhsjr://book/{book_id}` resource template
+- Result formatting: [src/lib/mcp/format.ts](src/lib/mcp/format.ts) — every tool returns a human-readable summary block plus a compact JSON block (null fields stripped, links attached); `MAX_PER_PAGE` caps a call at 50 records
+- Tools reuse the existing `src/lib/db.ts` / `src/lib/books.ts` functions — add new capabilities there first, then register them
+- `NEXT_PUBLIC_SITE_URL` (optional) turns links in tool results into absolute URLs
+- [.mcp.json](.mcp.json) wires the local dev endpoint for Claude Code
+
 ### Internationalization
 
 - Default locale: `ja` (Japanese)
