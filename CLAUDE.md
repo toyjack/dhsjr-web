@@ -65,8 +65,11 @@ Search functions in [src/lib/db.ts](src/lib/db.ts):
 All search functions support pagination with configurable `page` and `perPage` parameters.
 
 **PGroonga Setup:**
-- SQL setup: [supabase/functions/full_text_search.sql](supabase/functions/full_text_search.sql)
-- Documentation: [README_PGROONGA.md](README_PGROONGA.md)
+- The RPCs `searchAll` actually calls are defined in [supabase/functions/search_all_fields_by_word.sql](supabase/functions/search_all_fields_by_word.sql). [supabase/functions/full_text_search.sql](supabase/functions/full_text_search.sql) defines a different, unused set (`search_dhsjr_fulltext`).
+- `searchAll` searches 11 columns: character/word headwords and surface forms, `word_alphabet`, `kana`, `word_kana`, `fanqie`, `ruion`, `etc`, `notes`. Book name, shoten, shoten_word and hakase are deliberately excluded — a character common in book titles, or a tone value like 平, otherwise floods the results. Rows are ordered by which column matched (character → word → kana → fanqie/ruion → etc/notes), then `book_id`, then `index_in_book`.
+- `GLOBAL_SEARCH_COLUMNS` in `db.ts` (the `ilike` fallback) must mirror that column list.
+- Both functions need `SET search_path = public, extensions`: PGroonga lives in the `extensions` schema and the `anon`/`authenticated` roles have no search_path, so without it every PostgREST call fails with `operator does not exist: text &@~ text` (42883) and silently falls back to `ilike`.
+- `&@~` only uses the PGroonga index inside a `WHERE` clause. In a `CASE`, `FILTER` or select-list expression it degrades to a sequential match without the index normalizers (variant-kanji table, `unify_kana`) and under-matches.
 
 ### MCP Server
 

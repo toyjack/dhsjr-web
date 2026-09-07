@@ -6,16 +6,19 @@ import { supabase } from "./supabase";
 const PAGE = 1;
 const PER_PAGE = 100;
 
+// Must mirror the columns searched by search_dhsjr_all_fields_by_word
+// (see supabase/functions/search_all_fields_by_word.sql), so that the fallback
+// below returns the same result set as the PGroonga path. Book name, shoten and
+// shoten_word are deliberately excluded: a character common in book titles, or a
+// tone mark value like 平, otherwise floods the results.
 const GLOBAL_SEARCH_COLUMNS = [
   FIELD_TO_COLUMN.character,
+  FIELD_TO_COLUMN.character_original,
   FIELD_TO_COLUMN.word,
+  FIELD_TO_COLUMN.word_original,
+  FIELD_TO_COLUMN.word_alphabet,
   FIELD_TO_COLUMN.kana,
   FIELD_TO_COLUMN.word_kana,
-  FIELD_TO_COLUMN.shoten,
-  FIELD_TO_COLUMN.shoten_word,
-  FIELD_TO_COLUMN.book_name,
-  FIELD_TO_COLUMN.word_alphabet,
-  FIELD_TO_COLUMN.word_type,
   FIELD_TO_COLUMN.fanqie,
   FIELD_TO_COLUMN.ruion,
   FIELD_TO_COLUMN.etc,
@@ -40,6 +43,8 @@ async function searchAllFallback(term: string, page: number, perPage: number) {
     .from("dhsjr")
     .select("*", { count: "exact" })
     .or(orFilter)
+    .order(FIELD_TO_COLUMN.book_id, { ascending: true })
+    .order(FIELD_TO_COLUMN.index_in_book, { ascending: true })
     .range((page - 1) * perPage, page * perPage - 1);
 
   if (error) {
