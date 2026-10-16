@@ -2,16 +2,22 @@ import assert from "node:assert/strict";
 import { describe, it, mock } from "node:test";
 import { AjvJsonSchemaValidator } from "@modelcontextprotocol/server/validators/ajv";
 import { z } from "zod";
+import type { BookSource } from "@/lib/books";
 import { DbError } from "@/lib/db-error";
 import type { Dhsjr } from "@/lib/field-mapping";
 import { classifyError, failureResult } from "@/lib/mcp/errors";
 import {
+  characterUrl,
   errorResult,
+  pageSources,
   pageWarnings,
+  positionNote,
+  recordSource,
   searchResult,
   wildcardWarnings,
   wordResult,
 } from "@/lib/mcp/format";
+import { withRequestOrigin } from "@/lib/mcp/request-context";
 import { getWordOutput, searchAllOutput } from "@/lib/mcp/schemas";
 import { detailConditions } from "@/lib/search-params";
 
@@ -41,6 +47,18 @@ const record = (overrides: Partial<Dhsjr> = {}): Dhsjr => ({
   notes: null,
   ...overrides,
 });
+
+const ishinpo: BookSource = {
+  book_id: "20-002-01",
+  title: "医心方",
+  period: "平安",
+  holding_institution: "国立東京博物館",
+  input_notes: [
+    "出現位置は、「巻、裏表、行数」で示した。",
+    "声点は朱筆である。",
+  ],
+};
+const books = new Map([[ishinpo.book_id, ishinpo]]);
 
 const validator = new AjvJsonSchemaValidator();
 function assertMatchesSchema(schema: z.ZodType, value: unknown) {
@@ -133,6 +151,7 @@ describe("searchResult", () => {
     page: 1,
     perPage: 20,
     backend: "pgroonga" as const,
+    books,
   };
 
   it("full mode keeps the legacy text and JSON, and adds a valid envelope", () => {
@@ -212,7 +231,7 @@ describe("wordResult", () => {
         index_in_book: 30,
       }),
     ];
-    const result = wordResult("20-002-01", "19", records, "full");
+    const result = wordResult("20-002-01", "19", records, "full", books);
     const data = (
       result.structuredContent as {
         data: { word: Record<string, unknown>; records: unknown[] };
@@ -224,6 +243,10 @@ describe("wordResult", () => {
       "https://emuseum.nich.go.jp/iiifapi/100173002/manifest.json",
     );
     assert.equal(data.records.length, 2);
+    assert.equal(
+      (data as { source?: { title?: string } }).source?.title,
+      "医心方",
+    );
     assertMatchesSchema(getWordOutput, result.structuredContent);
     const legacy = JSON.parse(result.content[1].text);
     assert.deepEqual(Object.keys(legacy), [
@@ -233,5 +256,69 @@ describe("wordResult", () => {
       "word_url",
       "records",
     ]);
+  });
+});
+
+describe("links (D18)", () => {
+  it("stay site-relative outside a request", () => {
+    assert.equal(characterUrl("x"), "/character/x");
+  });
+
+  it("use the request's public origin inside a request", () => {
+    const url = withRequestOrigin("https://dhsjr.example.org", () =>
+      characterUrl("20-002-01-000030"),
+    );
+    assert.equal(url, "https://dhsjr.example.org/character/20-002-01-000030");
+  });
+
+  it("prefer NEXT_PUBLIC_SITE_URL over the request origin", (t) => {
+    const before = process.env.NEXT_PUBLIC_SITE_URL;
+    process.env.NEXT_PUBLIC_SITE_URL = "https://dhsjr.kojisho.com/";
+    t.after(() => {
+      if (before === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+      else process.env.NEXT_PUBLIC_SITE_URL = before;
+    });
+    const url = withRequestOrigin("http://localhost:3000", () =>
+      characterUrl("x"),
+    );
+    assert.equal(url, "https://dhsjr.kojisho.com/character/x");
+  });
+});
+
+describe("sources (D20)", () => {
+  it("quote only the input notes about 出現位置, verbatim", () => {
+    assert.deepEqual(positionNote(ishinpo.input_notes), [
+      "出現位置は、「巻、裏表、行数」で示した。",
+    ]);
+    assert.equal(positionNote(["声点は朱筆である。"]), undefined);
+    assert.equal(positionNote(null), undefined);
+  });
+
+  it("mark a book without bibliography but keep its book_url (D19)", () => {
+    const source = recordSource(
+      { book_id: "30-026-05", book_name: "貞享版四座講式" },
+      books,
+    );
+    assert.deepEqual(source, {
+      book_id: "30-026-05",
+      book_name: "貞享版四座講式",
+      bibliography: "missing",
+      book_url: "/book/30-026-05",
+    });
+  });
+
+  it("list each book of a search page once", () => {
+    const sources = pageSources(
+      [
+        record(),
+        record({ character_id: "b" }),
+        record({ character_id: "c", book_id: "30-026-05" }),
+      ],
+      books,
+    );
+    assert.deepEqual(Object.keys(sources), ["20-002-01", "30-026-05"]);
+    assert.equal(sources["20-002-01"].title, "医心方");
+    assert.equal(sources["20-002-01"].position_note, undefined);
+    assert.equal(sources["30-026-05"].bibliography, "missing");
   });
 });

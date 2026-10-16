@@ -1,11 +1,10 @@
+import type { BookSource } from "@/lib/books";
 import type { Dhsjr } from "@/lib/field-mapping";
 import type { DetailCondition } from "@/lib/search-params";
 import type { Tables } from "@/types/supabase.type";
 import { ALL_MANIFEST } from "../../../contents/manifest";
+import { currentRequestOrigin } from "./request-context";
 import { SCHEMA_VERSION, type Warning } from "./schemas";
-
-/** Absolute site origin used to build shareable links. Falls back to site-relative paths. */
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
 
 export const MAX_PER_PAGE = 50;
 export const DEFAULT_PER_PAGE = 20;
@@ -20,8 +19,21 @@ export type ErrorCode =
   | "DATABASE_UNAVAILABLE"
   | "TIMEOUT";
 
+/**
+ * Origin for shareable links (D18): NEXT_PUBLIC_SITE_URL when set, otherwise the
+ * public origin of the MCP request being handled. Outside a request (unit
+ * tests) links stay site-relative.
+ */
+function siteOrigin() {
+  const configured = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(
+    /\/$/,
+    "",
+  );
+  return configured || currentRequestOrigin() || "";
+}
+
 export function siteLink(path: string) {
-  return `${SITE_URL}${path}`;
+  return `${siteOrigin()}${path}`;
 }
 
 export function characterUrl(characterId: string) {
@@ -189,6 +201,54 @@ export function wildcardWarnings(conditions: DetailCondition[]): Warning[] {
     }));
 }
 
+/**
+ * The bibliography's own notes on how 出現位置 is written for this book, quoted
+ * verbatim (spec §6.2: position_in_book is never turned into a page or canvas).
+ */
+export function positionNote(inputNotes: string[] | null | undefined) {
+  const notes = (inputNotes ?? []).filter((note) => note.includes("出現位置"));
+  return notes.length > 0 ? notes : undefined;
+}
+
+/** Book-level source facts shared by `source` and `sources` (D20). */
+function sourceFacts(bookId: string, book: BookSource | undefined) {
+  return {
+    bibliography: book ? "registered" : "missing",
+    title: book?.title,
+    period: book?.period,
+    holding_institution: book?.holding_institution,
+    // Always present, even without a bibliography entry (D19).
+    book_url: bookUrl(bookId),
+    iiif_manifest: manifestOf(bookId),
+  };
+}
+
+/** Source of one record for get_character / get_word, with the position note. */
+export function recordSource(
+  record: Pick<Dhsjr, "book_id" | "book_name">,
+  books: Map<string, BookSource>,
+) {
+  if (!record.book_id) return undefined;
+  const book = books.get(record.book_id);
+  return withoutEmpty({
+    book_id: record.book_id,
+    book_name: record.book_name,
+    ...sourceFacts(record.book_id, book),
+    position_note: positionNote(book?.input_notes),
+  });
+}
+
+/** One short source entry per book on a search page, keyed by book_id. */
+export function pageSources(records: Dhsjr[], books: Map<string, BookSource>) {
+  const sources: Record<string, Record<string, unknown>> = {};
+  for (const { book_id } of records) {
+    if (book_id && !sources[book_id]) {
+      sources[book_id] = withoutEmpty(sourceFacts(book_id, books.get(book_id)));
+    }
+  }
+  return sources;
+}
+
 export function searchResult(
   records: Dhsjr[],
   options: {
@@ -199,6 +259,7 @@ export function searchResult(
     page: number;
     perPage: number;
     responseMode: ResponseMode;
+    books: Map<string, BookSource>;
     backend?: "pgroonga" | "ilike_fallback";
     warnings?: Warning[];
   },
@@ -226,7 +287,10 @@ export function searchResult(
       ...(hasMore ? { next_page: page + 1 } : {}),
       ...(options.backend ? { backend: options.backend } : {}),
     },
-    { records: records.map((record) => outputRecord(record, responseMode)) },
+    {
+      records: records.map((record) => outputRecord(record, responseMode)),
+      sources: pageSources(records, options.books),
+    },
     warnings,
   );
 
@@ -261,6 +325,7 @@ export function wordResult(
   wordIndexInBook: string,
   records: Dhsjr[],
   responseMode: ResponseMode,
+  books: Map<string, BookSource>,
 ): ToolResult {
   const head = records[0];
   const url = wordUrl(bookId, wordIndexInBook);
@@ -289,6 +354,7 @@ export function wordResult(
         iiif_manifest: manifestOf(bookId),
       }),
       records: records.map((record) => outputRecord(record, responseMode)),
+      source: recordSource(head, books),
     },
   );
 
@@ -318,6 +384,7 @@ export function wordResult(
 export function characterResult(
   characterId: string,
   record: Dhsjr,
+  books: Map<string, BookSource>,
 ): ToolResult {
   const structured = envelope(
     "character",
@@ -325,6 +392,7 @@ export function characterResult(
     withoutEmpty({
       record: compactRecord(record),
       iiif_manifest: manifestOf(record.book_id),
+      source: recordSource(record, books),
     }),
   );
   return toolResult(
@@ -352,11 +420,13 @@ export function bookResult(bookId: string, book: BookRow): ToolResult {
         holding_institution: book.holding_institution,
         image_info: book.image_info,
         input_notes: book.input_notes,
+        position_note: positionNote(book.input_notes),
         input_responsible: book.input_responsible,
         other: book.other,
         phonetic_info: book.phonetic_info,
+        // references_parsed is left out (D21): 69 of 226 entries have shifted
+        // fields (e.g. a date as publisher). references_raw is the source text.
         references_raw: book.references_raw,
-        references_parsed: book.references_parsed,
         parse_status: book.parse_status,
         source_file: book.source_file,
         imported_at: book.imported_at,

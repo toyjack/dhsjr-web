@@ -4,7 +4,7 @@ import {
   ResourceTemplate,
 } from "@modelcontextprotocol/server";
 import { z } from "zod";
-import { fetchBookData, fetchBookList } from "@/lib/books";
+import { fetchBookData, fetchBookList, fetchBooksByIds } from "@/lib/books";
 import {
   countBookRecords,
   getCharacterRecord,
@@ -12,6 +12,7 @@ import {
   search,
   searchAll,
 } from "@/lib/db";
+import type { Dhsjr } from "@/lib/field-mapping";
 import { cleanText, detailConditions } from "@/lib/search-params";
 import type { Inputs } from "@/types";
 import { failureResult } from "./errors";
@@ -94,6 +95,13 @@ const detailFields = {
   notes: z.string().optional().describe("備考（部分一致）"),
 };
 
+/** Bibliography entries for the books of these records (one query), for source / sources. */
+function booksOf(records: Pick<Dhsjr, "book_id">[]) {
+  const ids = new Set<string>();
+  for (const { book_id } of records) if (book_id) ids.add(book_id);
+  return fetchBooksByIds([...ids]);
+}
+
 export function registerDhsjr(server: McpServer) {
   server.registerTool(
     "search_all",
@@ -125,6 +133,7 @@ export function registerDhsjr(server: McpServer) {
       }
       try {
         const result = await searchAll(query, page, per_page);
+        const books = await booksOf(result.data);
         return searchResult(result.data, {
           tool: "search_all",
           query: { term: query },
@@ -133,6 +142,7 @@ export function registerDhsjr(server: McpServer) {
           page: result.meta.page,
           perPage: result.meta.perPage,
           responseMode: response_mode,
+          books,
           backend: result.meta.backend ?? "pgroonga",
         });
       } catch (error) {
@@ -167,6 +177,7 @@ export function registerDhsjr(server: McpServer) {
 
       try {
         const result = await search(params as Partial<Inputs>, page, per_page);
+        const books = await booksOf(result.data);
         const label = conditions
           .map(({ field, value }) => `${field}=${value}`)
           .join(", ");
@@ -182,6 +193,7 @@ export function registerDhsjr(server: McpServer) {
           page: result.meta.page,
           perPage: result.meta.perPage,
           responseMode: response_mode,
+          books,
           warnings: wildcardWarnings(conditions),
         });
       } catch (error) {
@@ -269,7 +281,13 @@ export function registerDhsjr(server: McpServer) {
             "book_id と word_index_in_book は検索結果のレコードの値を指定してください。",
           );
         }
-        return wordResult(book_id, word_index_in_book, records, response_mode);
+        return wordResult(
+          book_id,
+          word_index_in_book,
+          records,
+          response_mode,
+          await fetchBooksByIds([book_id]),
+        );
       } catch (error) {
         return failureResult("get_word", error);
       }
@@ -301,7 +319,7 @@ export function registerDhsjr(server: McpServer) {
             "検索結果の character_id を指定してください。",
           );
         }
-        return characterResult(character_id, record);
+        return characterResult(character_id, record, await booksOf([record]));
       } catch (error) {
         return failureResult("get_character", error);
       }

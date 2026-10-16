@@ -1,5 +1,6 @@
-import { createMcpHandler } from "mcp-handler";
+import { createMcpHandler, getPublicOrigin } from "mcp-handler";
 import { registerDhsjr } from "@/lib/mcp/register";
+import { withRequestOrigin } from "@/lib/mcp/request-context";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,4 +28,10 @@ const handler = createMcpHandler(
   },
 );
 
-export { handler as GET, handler as POST, handler as DELETE };
+// Links in tool results use the request's public origin (proxy headers, or the
+// request URL) unless NEXT_PUBLIC_SITE_URL is set.
+function handle(req: Request) {
+  return withRequestOrigin(getPublicOrigin(req), () => handler(req));
+}
+
+export { handle as GET, handle as POST, handle as DELETE };

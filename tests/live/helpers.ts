@@ -30,7 +30,11 @@ export function isDetailOrder(rows: OrderedRow[]) {
 let nextId = 1;
 
 /** Send one JSON-RPC request to the /api/mcp route handler in-process. */
-export async function mcpRequest(method: string, params: object = {}) {
+export async function mcpRequest(
+  method: string,
+  params: object = {},
+  headers: Record<string, string> = {},
+) {
   const { POST } = await import("@/app/api/mcp/route");
   const res = await POST(
     new Request("http://localhost:3000/api/mcp", {
@@ -39,6 +43,7 @@ export async function mcpRequest(method: string, params: object = {}) {
         "content-type": "application/json",
         accept: "application/json, text/event-stream",
         "mcp-protocol-version": "2025-06-18",
+        ...headers,
       },
       body: JSON.stringify({ jsonrpc: "2.0", id: nextId++, method, params }),
     }),
@@ -63,11 +68,16 @@ export async function mcpRequest(method: string, params: object = {}) {
 }
 
 /** Call one tool in-process and split its result into the parts the tests check. */
-export async function callMcpTool(name: string, args: object) {
-  const { result, bytes } = await mcpRequest("tools/call", {
-    name,
-    arguments: args,
-  });
+export async function callMcpTool(
+  name: string,
+  args: object,
+  headers: Record<string, string> = {},
+) {
+  const { result, bytes } = await mcpRequest(
+    "tools/call",
+    { name, arguments: args },
+    headers,
+  );
   const { content, isError, structuredContent } = result as {
     content: { type: string; text: string }[];
     isError?: boolean;

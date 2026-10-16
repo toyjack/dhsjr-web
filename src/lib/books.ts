@@ -2,16 +2,16 @@ import { dbError } from "./db-error";
 import { supabase } from "./supabase";
 
 export interface BookData {
-    id: string
-    title: string
-    age: string
-    owner: string
-    pictures: string[]
-    guide: string[]
-    information: string[]
-    inputor: string[]
-    bibs: string[]
-  }
+  id: string;
+  title: string;
+  age: string;
+  owner: string;
+  pictures: string[];
+  guide: string[];
+  information: string[];
+  inputor: string[];
+  bibs: string[];
+}
 
 /** Book bibliography, or null when the book is not registered. Throws DbError on database errors. */
 export async function fetchBookData(bookId: string) {
@@ -22,7 +22,11 @@ export async function fetchBookData(bookId: string) {
     .limit(1)
     .maybeSingle();
   if (error) {
-    throw dbError(`Failed to fetch book data for bookId ${bookId}`, error, status);
+    throw dbError(
+      `Failed to fetch book data for bookId ${bookId}`,
+      error,
+      status,
+    );
   }
   return data;
 }
@@ -37,6 +41,36 @@ export async function fetchBookList() {
     throw dbError("Failed to fetch book list", error, status);
   }
   return data;
+}
+
+const SOURCE_COLUMNS =
+  "book_id, title, period, holding_institution, input_notes" as const;
+
+/** Bibliography fields used to cite a record's source. */
+export type BookSource = {
+  book_id: string;
+  title: string | null;
+  period: string | null;
+  holding_institution: string | null;
+  input_notes: string[] | null;
+};
+
+/**
+ * Bibliography entries for several books in one query, keyed by book_id.
+ * Books without a bibliography entry are simply absent. Throws DbError.
+ */
+export async function fetchBooksByIds(bookIds: string[]) {
+  const books = new Map<string, BookSource>();
+  if (bookIds.length === 0) return books;
+  const { data, error, status } = await supabase
+    .from("dhsjr-books")
+    .select(SOURCE_COLUMNS)
+    .in("book_id", bookIds);
+  if (error) {
+    throw dbError("Failed to fetch book sources", error, status);
+  }
+  for (const book of data ?? []) books.set(book.book_id, book);
+  return books;
 }
 
 // The Web pages use these. They treat a database error like a missing book /

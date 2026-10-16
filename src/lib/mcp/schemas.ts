@@ -2,7 +2,7 @@ import { z } from "zod";
 import { DETAIL_FILTERS } from "@/lib/search-params";
 
 // Output schemas (structuredContent) for the MCP tools.
-// See docs/DHSJR_MCP_PHASE2_DESIGN.md. Every tool returns
+// See docs/DHSJR_MCP_PHASE2_DESIGN.md and DHSJR_MCP_PHASE3_DESIGN.md. Every tool returns
 // { schema_version, kind, meta, data }. Fields that are null or empty in the
 // database are omitted, so they are optional here.
 //
@@ -10,7 +10,8 @@ import { DETAIL_FILTERS } from "@/lib/search-params";
 // that validates against the published schema rejects any field not declared
 // here. tests/live/mcp-contract.test.ts checks real results against it.
 
-export const SCHEMA_VERSION = "1.0";
+// 1.1 (Phase 3): source / sources, book.position_note; book.references_parsed removed.
+export const SCHEMA_VERSION = "1.1";
 
 const opt = (description?: string) =>
   description
@@ -63,6 +64,41 @@ export const recordSchema = z
 
 export const responseModeSchema = z.enum(["full", "compact"]);
 
+const positionNoteSchema = z
+  .array(z.string())
+  .optional()
+  .describe(
+    "書誌の入力凡例のうち出現位置の書式を説明する部分（原文のまま）。position_in_book の読み方はこれに従う",
+  );
+
+const sourceFacts = {
+  bibliography: z
+    .enum(["registered", "missing"])
+    .describe(
+      "missing: レコードはあるが書誌情報が未登録（book_url のページも見つからない）",
+    ),
+  title: opt("書誌上の資料名"),
+  period: opt("年代"),
+  holding_institution: opt("所蔵"),
+  book_url: z.string().describe("資料ページ"),
+  iiif_manifest: opt(
+    "登録済みの IIIF マニフェスト（資料の一部の巻のみのことがある）",
+  ),
+};
+
+export const sourceSchema = z
+  .object({
+    book_id: z.string(),
+    book_name: opt("レコード上の資料名"),
+    ...sourceFacts,
+    position_note: positionNoteSchema,
+  })
+  .describe("出典（引用に使える書誌情報）");
+
+const pageSourcesSchema = z
+  .record(z.string(), z.object(sourceFacts))
+  .describe("このページのレコードの出典（book_id ごと）");
+
 const envelope = <
   K extends string,
   M extends z.ZodRawShape,
@@ -102,7 +138,7 @@ export const searchAllOutput = envelope(
         "ilike_fallback では異体字・仮名の正規化と一致順位の並びがない",
       ),
   },
-  { records: z.array(recordSchema) },
+  { records: z.array(recordSchema), sources: pageSourcesSchema },
 );
 
 export const searchDetailOutput = envelope(
@@ -120,7 +156,7 @@ export const searchDetailOutput = envelope(
     }),
     ...pagingMeta,
   },
-  { records: z.array(recordSchema) },
+  { records: z.array(recordSchema), sources: pageSourcesSchema },
 );
 
 export const getWordOutput = envelope(
@@ -153,6 +189,7 @@ export const getWordOutput = envelope(
       .describe(
         "構成字レコード（資料内の順）。字ごとの仮名注・声点はここにある",
       ),
+    source: sourceSchema.optional(),
   },
 );
 
@@ -162,7 +199,11 @@ export const getCharacterOutput = envelope(
     tool: z.literal("get_character"),
     query: z.object({ character_id: z.string() }),
   },
-  { record: recordSchema, iiif_manifest: opt() },
+  {
+    record: recordSchema,
+    iiif_manifest: opt(),
+    source: sourceSchema.optional(),
+  },
 );
 
 const stringList = z.array(z.string()).optional();
@@ -175,11 +216,11 @@ export const bookSchema = z.object({
   holding_institution: opt("所蔵"),
   image_info: stringList,
   input_notes: stringList,
+  position_note: positionNoteSchema,
   input_responsible: stringList,
   other: stringList,
   phonetic_info: stringList,
-  references_raw: stringList,
-  references_parsed: z.unknown().optional(),
+  references_raw: stringList.describe("参考文献（原文）"),
   parse_status: z.string(),
   source_file: opt(),
   imported_at: opt(),

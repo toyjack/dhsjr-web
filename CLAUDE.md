@@ -14,7 +14,8 @@ This is a multilingual web application for searching Japanese character and word
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint linter
 - `pnpm test` - Unit tests (`node:test` + tsx, no database)
-- `DHSJR_LIVE_TESTS=1 pnpm test:live` - Read-only integration tests against the Supabase project in `.env` (pagination completeness, Web/MCP consistency)
+- `DHSJR_LIVE_TESTS=1 pnpm test:live` - Read-only integration tests against the Supabase project in `.env` (pagination completeness, Web/MCP consistency, MCP contract tests)
+- `DHSJR_IIIF_TESTS=1 pnpm test:iiif` - Fetches the IIIF manifests in `contents/manifest.ts` from their third-party hosts and checks they are valid
 
 ### Data Management Scripts
 - `pnpm data:update` - Import/update character data from TSV files in `contents/data/`
@@ -84,7 +85,8 @@ A read-only MCP (Model Context Protocol) server is exposed as a Next.js route ha
 - Result formatting: [src/lib/mcp/format.ts](src/lib/mcp/format.ts) — besides `structuredContent`, the text content keeps the original summary block plus the original JSON block (null fields stripped, links attached), unchanged for older clients; `list_books` returns the envelope as its JSON block. `response_mode: "compact"` (search_all, search_detail, get_word) drops the summary lines and `word_url`/`book_url`. `MAX_PER_PAGE` caps a call at 50 records. Claude Code passes only `structuredContent` to the model, so anything the model must see belongs in the envelope (e.g. `meta.warnings`), not only in the summary text
 - Errors: [src/lib/mcp/errors.ts](src/lib/mcp/errors.ts) — error results are text starting with `[CODE]` (`EMPTY_QUERY`, `NOT_FOUND`, `SEARCH_FAILED`, `DATABASE_UNAVAILABLE`, `TIMEOUT`) and carry no `structuredContent`; database messages go to the server log only. db/books functions throw `DbError` ([src/lib/db-error.ts](src/lib/db-error.ts)) so failures can be classified
 - Tools reuse the existing `src/lib/db.ts` / `src/lib/books.ts` functions — add new capabilities there first, then register them. MCP uses the throwing `fetchBookData` / `fetchBookList`; the Web keeps `getBookData` / `getBookList`, which turn database errors into "not found" / an empty list
-- `NEXT_PUBLIC_SITE_URL` (optional) turns links in tool results into absolute URLs
+- Links in tool results are absolute: `NEXT_PUBLIC_SITE_URL` when set (inlined at build time), otherwise the request's public origin. `route.ts` stores `getPublicOrigin(req)` in an `AsyncLocalStorage` ([src/lib/mcp/request-context.ts](src/lib/mcp/request-context.ts)) that `siteLink()` reads; outside a request (unit tests) links stay relative. Links have no locale prefix (`/en/...` redirects to the unprefixed path)
+- Sources (schema 1.1): `get_character` / `get_word` return `data.source` and search results `data.sources` (per book on the page) from `fetchBooksByIds`: title, period, holding, `book_url`, IIIF manifest, `bibliography: "registered" | "missing"`, and `position_note` — the bibliography's `input_notes` lines about 出現位置, quoted verbatim. `position_in_book` is never converted to a page or IIIF canvas. Structured `get_book` omits `references_parsed` (many entries have shifted fields); `references_raw` is the source text
 - [.mcp.json](.mcp.json) wires the local dev endpoint for Claude Code
 
 ### Internationalization

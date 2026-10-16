@@ -43,7 +43,12 @@ type Envelope = {
 };
 const envelope = (call: Call) => call.structured as unknown as Envelope;
 const records = (call: Call) =>
-  envelope(call).data.records as { character_id: string; word_url?: string }[];
+  envelope(call).data.records as {
+    character_id: string;
+    book_id: string;
+    url: string;
+    word_url?: string;
+  }[];
 const warningCodes = (call: Call) =>
   envelope(call).meta.warnings.map((w) => w.code);
 
@@ -277,5 +282,95 @@ describe("errors", { skip: SKIP_REASON }, () => {
     assert.ok(error);
     assert.notEqual(error.code, -32603);
     assert.match(error.message, /NOPE/);
+  });
+});
+
+describe("links and sources (Phase 3)", { skip: SKIP_REASON }, () => {
+  it("links are absolute, from the request origin (D18)", async () => {
+    const local = await callMcpTool("search_all", { term: "東", per_page: 2 });
+    assertValid("search_all", local);
+    assert.equal(envelope(local).schema_version, "1.1");
+    for (const r of records(local)) {
+      assert.ok(r.url.startsWith("http://localhost:3000/character/"));
+    }
+
+    const proxied = await callMcpTool(
+      "get_character",
+      { character_id: "20-002-01-000030" },
+      { "x-forwarded-host": "dhsjr.example.org", "x-forwarded-proto": "https" },
+    );
+    const record = envelope(proxied).data.record as Record<string, string>;
+    assert.equal(
+      record.url,
+      "https://dhsjr.example.org/character/20-002-01-000030",
+    );
+    assert.equal(record.book_url, "https://dhsjr.example.org/book/20-002-01");
+    assert.equal(
+      proxied.json.url,
+      record.url,
+      "legacy JSON uses the same links",
+    );
+  });
+
+  it("search pages list each record's book once in sources (D20)", async () => {
+    const call = await callMcpTool("search_detail", {
+      character: "東",
+      per_page: 50,
+    });
+    assertValid("search_detail", call);
+    const sources = envelope(call).data.sources as Record<
+      string,
+      Record<string, unknown>
+    >;
+    const bookIds = new Set(records(call).map((r) => r.book_id));
+    assert.deepEqual(new Set(Object.keys(sources)), bookIds);
+    // 30-026-05 has records but no bibliography entry (NEW-7).
+    if (sources["30-026-05"]) {
+      assert.equal(sources["30-026-05"].bibliography, "missing");
+      assert.ok(sources["30-026-05"].book_url, "book_url kept (D19)");
+    }
+    assert.equal(sources[records(call)[0].book_id].bibliography, "registered");
+  });
+
+  it("get_character / get_word carry a source with the position note", async () => {
+    const character = await callMcpTool("get_character", {
+      character_id: "20-002-01-000030",
+    });
+    assertValid("get_character", character);
+    const source = envelope(character).data.source as Record<string, unknown>;
+    assert.equal(source.bibliography, "registered");
+    assert.equal(source.title, "医心方");
+    assert.match((source.position_note as string[])[0], /出現位置/);
+
+    const word = await callMcpTool("get_word", {
+      book_id: "30-010-01",
+      word_index_in_book: "1029",
+    });
+    assertValid("get_word", word);
+    assert.equal(
+      (envelope(word).data.source as Record<string, unknown>).book_id,
+      "30-010-01",
+    );
+  });
+
+  it("a book without bibliography: source says missing, book_url kept", async () => {
+    const call = await callMcpTool("get_character", {
+      character_id: "30-026-05-000663",
+    });
+    assertValid("get_character", call);
+    const source = envelope(call).data.source as Record<string, unknown>;
+    assert.equal(source.bibliography, "missing");
+    assert.equal(source.title, undefined);
+    assert.ok((source.book_url as string).endsWith("/book/30-026-05"));
+  });
+
+  it("get_book: no references_parsed in structuredContent, legacy JSON unchanged (D21)", async () => {
+    const call = await callMcpTool("get_book", { book_id: "20-045-01" });
+    assertValid("get_book", call);
+    const book = envelope(call).data.book as Record<string, unknown>;
+    assert.equal(book.references_parsed, undefined);
+    assert.ok(Array.isArray(book.references_raw));
+    assert.ok(Array.isArray(book.position_note));
+    assert.ok("references_parsed" in call.json);
   });
 });
