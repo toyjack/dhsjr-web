@@ -13,6 +13,8 @@ This is a multilingual web application for searching Japanese character and word
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint linter
+- `pnpm test` - Unit tests (`node:test` + tsx, no database)
+- `DHSJR_LIVE_TESTS=1 pnpm test:live` - Read-only integration tests against the Supabase project in `.env` (pagination completeness, Web/MCP consistency)
 
 ### Data Management Scripts
 - `pnpm data:update` - Import/update character data from TSV files in `contents/data/`
@@ -58,16 +60,17 @@ Search functions in [src/lib/db.ts](src/lib/db.ts):
 
 1. **getBookList()** - Returns static book list from `contents/books.json`
 2. **searchAll(term, page, perPage)** - Global search using PGroonga RPC (`search_dhsjr_all_fields_by_word`), with automatic fallback to `ilike` if PGroonga is unavailable
-3. **search(params, page, perPage)** - Detailed search with field-specific `ilike` filtering via `Inputs` type
+3. **search(params, page, perPage)** - Detailed search with field-specific `ilike` filtering via `Inputs` type, ordered by `資料番号, 資料内漢字番号, ID` (without an explicit order, range pagination repeats and skips rows)
 4. **getWord(bookId, wordIndexInBook)** - Fetch a single word record by book ID and word index
 5. **getWordRecords(bookId, wordIndexInBook)** - Fetch all character records for a word, ordered by `index_in_book`
 
-All search functions support pagination with configurable `page` and `perPage` parameters.
+All search functions support pagination with configurable `page` and `perPage` parameters. Parameter parsing shared by the Web results page, the MCP tools and `db.ts` lives in [src/lib/search-params.ts](src/lib/search-params.ts) (`normalizePagination`, `detailConditions`, the fallback's `.or()` quoting); it has no Supabase import so it can be unit-tested.
 
 **PGroonga Setup:**
 - The RPCs `searchAll` actually calls are defined in [supabase/functions/search_all_fields_by_word.sql](supabase/functions/search_all_fields_by_word.sql). [supabase/functions/full_text_search.sql](supabase/functions/full_text_search.sql) defines a different, unused set (`search_dhsjr_fulltext`).
 - `searchAll` searches 11 columns: character/word headwords and surface forms, `word_alphabet`, `kana`, `word_kana`, `fanqie`, `ruion`, `etc`, `notes`. Book name, shoten, shoten_word and hakase are deliberately excluded — a character common in book titles, or a tone value like 平, otherwise floods the results. Rows are ordered by which column matched (character → word → kana → fanqie/ruion → etc/notes), then `book_id`, then `index_in_book`.
-- `GLOBAL_SEARCH_COLUMNS` in `db.ts` (the `ilike` fallback) must mirror that column list.
+- `GLOBAL_SEARCH_COLUMNS` in `search-params.ts` (the `ilike` fallback) must mirror that column list. Fallback results carry `meta.backend = "ilike_fallback"`: they lack variant/kana normalization and match-rank order.
+- The RPC caps `page_size` at 500 until [supabase/migrations/20261016000000_search_all_stable_order.sql](supabase/migrations/20261016000000_search_all_stable_order.sql) is applied (raises it to 1000 and adds `ID` as the final sort key); `SEARCH_ALL_MAX_PER_PAGE` mirrors that limit.
 - Both functions need `SET search_path = public, extensions`: PGroonga lives in the `extensions` schema and the `anon`/`authenticated` roles have no search_path, so without it every PostgREST call fails with `operator does not exist: text &@~ text` (42883) and silently falls back to `ilike`.
 - `&@~` only uses the PGroonga index inside a `WHERE` clause. In a `CASE`, `FILTER` or select-list expression it degrades to a sequential match without the index normalizers (variant-kanji table, `unify_kana`) and under-matches.
 

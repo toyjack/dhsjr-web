@@ -266,3 +266,102 @@ Phase 1 不涉及：MCP 输出格式（Phase 2）、URL 绝对化（Phase 3）�
 | D8 | 分支与提交 | 新建 `feat/mcp-phase1-search-correctness`，规格书和本报告作为首个 commit，之后每阶段一个 commit；不合并 `main`、不 push | Phase 1 开始时执行 |
 
 另有两件不属于本项目代码范围、需要您处理的事：NEW-7（资料主表 3 个编号不一致）和生产环境设置 `NEXT_PUBLIC_SITE_URL=https://dhsjr.kojisho.com`（Phase 3 也会在代码中加入按请求推导 origin 的回退）。
+
+---
+
+# Phase 1 实施结果（2026-10-16）
+
+分支 `feat/mcp-phase1-search-correctness`（未合并、未 push、未部署）。数据库只读；SQL 迁移只写成文件，**未执行**。
+
+## 1. 第 0 步：只读诊断（D7）
+
+用 `DB_URL` 连接，所有语句都在 `BEGIN READ ONLY … ROLLBACK` 中执行（`transaction_read_only = on`），未执行任何 DDL/DML。
+
+| 项目 | 结果 |
+|---|---|
+| 版本 | PostgreSQL 15.8，PGroonga 3.2.5（`extensions` schema） |
+| 线上函数与仓库 SQL | `search_dhsjr_all_fields_by_word`、`count_dhsjr_all_fields_by_word` 的函数体与 `supabase/functions/search_all_fields_by_word.sql` **完全一致**（忽略空白和注释），`search_path = public, extensions` 已设置 |
+| `dhsjr` 的索引 | 主键 btree `("ID")`，以及 3 个 PGroonga 索引（全字段、`仮名型`、`漢語_見出し`）。**`資料番号`、`単字_見出し` 没有 btree 索引** |
+| 排序键唯一性（全表 387,268 行） | `(資料番号, 資料内漢字番号)` 共 387,268 个不同值（全部唯一）；`資料番号` 无 NULL；**所有行**的 `ID` 都等于 `資料番号-` 加 6 位补零的 `資料内漢字番号`；`資料内漢字番号` 最大 77,588 |
+| ISSUE-001 的成因 | 不排序时执行计划为顺序扫描，部分为并行扫描（`Gather workers=2`），行的返回顺序随请求变化，因此 offset 分页会重复和遗漏 |
+
+`EXPLAIN ANALYZE`（数据库内执行时间）：
+
+| 查询 | 现状（无 ORDER BY） | 新排序 | 计划 |
+|---|---|---|---|
+| `character=東` 第 1 页 / 20 | 3.2 ms | 43.7 ms | 顺序扫描 + top-N heapsort |
+| `book_id=20-002-01` 第 2 页 / 1000 | 28.1 ms | 31.1 ms | 并行顺序扫描 + quicksort |
+| `shoten ILIKE 平`（4.2 万件）第 1 页 / 100 | 11.8 ms | 28.3 ms | PGroonga 位图扫描 + top-N |
+| 同上，第 401 页 | 22.2 ms | 61.8 ms | 外部归并排序 |
+| `kana ILIKE %`（27.7 万件）第 1 页 / 100 | 8.3 ms | 82.5 ms | 位图扫描 + 并行 top-N |
+| 同上，第 2701 页 | 134.9 ms | 224.1 ms | 外部归并排序 |
+| `search_all` 函数体加 `ID` 最终键（東 / 経 / キヤウ） | 31.7 / 34.7 / 54.1 ms | 25.3 / 32.9 / 41.3 ms | 无可测差异 |
+
+结论：新排序最多增加约 90 ms（极深分页约 224 ms），远低于超时，**不需要新增索引**。
+
+## 2. 修改的文件
+
+| 文件 | 改动 |
+|---|---|
+| `src/lib/search-params.ts`（新） | 不依赖 Supabase 的纯函数：`normalizePagination`、`cleanText`、`detailConditions`（字段→列、完全/部分一致、去空白、忽略未知参数）、`quoteFilterValue` / `globalSearchOrFilter`（回退 `.or()` 加引号）、`isRangeNotSatisfiable`；`GLOBAL_SEARCH_COLUMNS` 从 `db.ts` 移到这里 |
+| `src/lib/db.ts` | `search()` 和回退按 `資料番号, 資料内漢字番号, ID` 排序（D1）；越界页返回空页 + 真实件数；分页参数规范化；`searchAll` 每页最多 500（D5，迁移前）；只有空白条件时报错而不是返回全表；`searchAll` 结果带 `meta.backend`（D3） |
+| `src/types.ts` | `SearchResults.meta.backend?: "pgroonga" \| "ilike_fallback"`（可选字段） |
+| `src/lib/mcp/register.ts` | `search_detail` 用 `detailConditions` 判断条件是否为空并生成标签（去掉首尾空白） |
+| `src/app/[locale]/results/page.tsx` | 用同一个解析函数判断是否有检索条件 |
+| `supabase/migrations/20261016000000_search_all_stable_order.sql`（新，**未执行**） | 只改 3 处：`ORDER BY` 末尾加 `d."ID"`；`page_number`/`page_size` 为 NULL 时报错；`page_size` 上限 500 → 1000。已与线上定义逐行比对，没有其他差异 |
+| `tests/unit/search-params.test.ts`、`tests/live/*.ts`（新） | 见 §3 |
+| `package.json` | 新增 `test`、`test:live` 脚本（无新依赖） |
+| `CLAUDE.md` | 测试命令、排序说明、`search-params.ts` 与迁移的说明 |
+
+## 3. 测试结果
+
+| 测试 | 结果 |
+|---|---|
+| `pnpm test`（单元测试，无数据库） | **13/13 通过** |
+| `DHSJR_LIVE_TESTS=1 pnpm test:live`（线上只读，约 100 次请求） | **21/21 通过** |
+| 红灯检查：同一组线上测试换回修改前的 `db.ts` | 21 项中 12 项失败（T11、T11b、越界页、缺少分页参数、1000 件/页、空白条件、去空白、Web/MCP 结果一致性等），说明测试能检出原问题 |
+| 不设置 `DHSJR_LIVE_TESTS` | 5 个测试组全部跳过并显示原因 |
+| `tsc --noEmit` | 通过 |
+| `pnpm build` | 通过 |
+| Biome（`db.ts`、`search-params.ts`、`register.ts`、`tests/`） | 通过。`results/page.tsx`、`types.ts` 在修改前就未按 Biome 格式化，为避免无关改动没有重排 |
+| `pnpm lint` | 仍然失败（缺少 ESLint 配置，既有问题，未处理） |
+
+线上测试覆盖的基线项与结果：
+
+| 基线 ID | Phase 0 | Phase 1 |
+|---|---|---|
+| T11 `character=東` 每页 20 | 170/252 唯一 | 252/252 唯一，按排序键有序 |
+| T11b `book_id=20-002-01` 每页 1000 | 2002/2917 唯一 | 2917/2917 唯一 |
+| T11c `search_all 東` 每页 50 | 721/721 | 721/721（未退化） |
+| 越界页（`search_detail` 第 99 页） | 错误 | 空页 + 正确件数 |
+| W1 全文检索 1000 件/页 | 错误 | 按 500 件/页返回（迁移后可到 1000） |
+| W2 缺少 `page`/`perPage` | 有件数无记录；全文检索返回全部命中 | 第 1 页、每页 100 件 |
+| 回退 `.or()` 中的 `)` `,` | 结构被改变 / 报错 | 作为值的一部分（`東)zzz` → 0 件，无报错） |
+| Web 与 MCP 同条件结果 | 顺序不稳定，无法逐条对比 | `search_detail` 第 1/2/13 页、`search_all` 第 1/2 页的件数、ID、顺序完全一致 |
+| D2 通配符保留 | — | `kana="%"` 件数 = `仮名注` 非空行数 |
+| 新/旧字体 | — | `search_all` 経=經；`search_detail character=経` 仍为 0（未改变规则） |
+
+端到端延迟（本机 → Supabase，3 次取中位数）：
+
+| 查询 | 修改前 | 修改后 |
+|---|---|---|
+| 详细 `character=東` 第 1 页 / 20 | 60 ms | 76 ms |
+| 详细 `book_id=20-002-01` 第 2 页 / 1000 | 94 ms | 103 ms |
+| 详细 `shoten=平` 第 1 页 / 100 | 48 ms | 77 ms |
+| 详细 `shoten=平` 第 400 页 / 100 | 61 ms | 108 ms |
+| 详细 `kana=キ` 第 1 页 / 100 | 47 ms | 51 ms |
+| `search_all 東` 第 1 页 / 20 | 101 ms | 109 ms |
+
+## 4. 兼容性影响
+
+- **Web 详细检索的显示顺序改变**：从不稳定的扫描顺序改为按资料编号、资料内编号排序（ISSUE-001 的修复本身）。
+- **MCP**：工具名称、参数、输出格式均不变。`search_detail` 结果顺序同上；越界页从 `isError` 改为空页；只有空白值的参数现在被视为“未指定”（例如 `kana: "  "` 返回“请指定条件”，以前按字面空格检索得到 0 件）；条件值去掉首尾空白（`" 東 "` 与 `"東"` 结果相同）。
+- **Web 结果页**：只含未知参数（如 `?hakase=31`）的 URL 现在显示「検索条件が指定されていません」，以前返回全表；全文检索选择 1000 件/页时，在迁移执行前实际按 500 件/页显示，分页数按 500 计算，但下拉框仍显示「1000件表示」。
+- 检索规则（字段、完全/部分一致、通配符、PGroonga 语法、字形）均未改变。
+
+## 5. 未完成事项与需要您处理的事
+
+1. **执行迁移**（由您执行）：`supabase/migrations/20261016000000_search_all_stable_order.sql`。执行后我需要做两处后续修改：把 `SEARCH_ALL_MAX_PER_PAGE` 改为 1000，并用新定义更新 `supabase/functions/search_all_fields_by_word.sql`。迁移与当前代码前后兼容，可以分开上线。
+2. 回退时的警告还没有显示给 MCP 调用方（`meta.backend` 已有，按计划在 Phase 2 输出）。
+3. 仍未测试：T17（数据库故障）、ChatGPT 客户端；RLS / anon 权限仍需数据库负责人确认（不在 D7 授权范围内，未查询）。
+4. 既有问题未处理：`pnpm lint` 配置缺失、NEW-7 资料主表编号不一致。

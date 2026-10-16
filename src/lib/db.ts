@@ -1,29 +1,18 @@
 import type { Inputs, SearchResults } from "@/types";
 import { getBookList as getStaticBookList } from "./books";
 import { FIELD_TO_COLUMN, rowToDhsjr } from "./field-mapping";
+import {
+  cleanText,
+  DEFAULT_PAGE,
+  DEFAULT_PER_PAGE,
+  type DetailCondition,
+  detailConditions,
+  globalSearchOrFilter,
+  isRangeNotSatisfiable,
+  normalizePagination,
+  SEARCH_ALL_MAX_PER_PAGE,
+} from "./search-params";
 import { supabase } from "./supabase";
-
-const PAGE = 1;
-const PER_PAGE = 100;
-
-// Must mirror the columns searched by search_dhsjr_all_fields_by_word
-// (see supabase/functions/search_all_fields_by_word.sql), so that the fallback
-// below returns the same result set as the PGroonga path. Book name, shoten and
-// shoten_word are deliberately excluded: a character common in book titles, or a
-// tone mark value like 平, otherwise floods the results.
-const GLOBAL_SEARCH_COLUMNS = [
-  FIELD_TO_COLUMN.character,
-  FIELD_TO_COLUMN.character_original,
-  FIELD_TO_COLUMN.word,
-  FIELD_TO_COLUMN.word_original,
-  FIELD_TO_COLUMN.word_alphabet,
-  FIELD_TO_COLUMN.kana,
-  FIELD_TO_COLUMN.word_kana,
-  FIELD_TO_COLUMN.fanqie,
-  FIELD_TO_COLUMN.ruion,
-  FIELD_TO_COLUMN.etc,
-  FIELD_TO_COLUMN.notes,
-];
 
 function shouldFallbackGlobalSearch(errorMessage: string) {
   return (
@@ -33,32 +22,71 @@ function shouldFallbackGlobalSearch(errorMessage: string) {
   );
 }
 
-async function searchAllFallback(term: string, page: number, perPage: number) {
-  const wildcard = `%${term}%`;
-  const orFilter = GLOBAL_SEARCH_COLUMNS.map(
-    (column) => `${column}.ilike.${wildcard}`,
-  ).join(",");
+function selectDhsjr(head = false) {
+  return supabase.from("dhsjr").select("*", { count: "exact", head });
+}
 
-  const { data, count, error } = await supabase
-    .from("dhsjr")
-    .select("*", { count: "exact" })
-    .or(orFilter)
+type DhsjrQuery = ReturnType<typeof selectDhsjr>;
+
+/**
+ * One page of filtered rows in a deterministic order: 資料番号, 資料内漢字番号,
+ * then ID as the final unique key. Without an ORDER BY, Postgres returns rows
+ * in scan order, which differs between requests, so range pagination repeated
+ * some rows and skipped others.
+ */
+async function fetchPage(
+  filter: (query: DhsjrQuery) => DhsjrQuery,
+  page: number,
+  perPage: number,
+) {
+  const { data, count, error } = await filter(selectDhsjr())
     .order(FIELD_TO_COLUMN.book_id, { ascending: true })
     .order(FIELD_TO_COLUMN.index_in_book, { ascending: true })
+    .order(FIELD_TO_COLUMN.character_id, { ascending: true })
     .range((page - 1) * perPage, page * perPage - 1);
 
+  if (isRangeNotSatisfiable(error)) {
+    // Past the last page: return an empty page with the real total, as searchAll does.
+    const { count: total, error: countError } = await filter(selectDhsjr(true));
+    if (countError) {
+      throw new Error(`Search failed: ${countError.message}`);
+    }
+    return { rows: [], count: total ?? 0 };
+  }
   if (error) {
     throw new Error(`Search failed: ${error.message}`);
   }
+  return { rows: data ?? [], count: count ?? 0 };
+}
+
+function applyConditions(query: DhsjrQuery, conditions: DetailCondition[]) {
+  let filtered = query;
+  for (const { column, op, value } of conditions) {
+    filtered =
+      op === "eq"
+        ? filtered.eq(column, value)
+        : filtered.ilike(column, `%${value}%`);
+  }
+  return filtered;
+}
+
+async function searchAllFallback(term: string, page: number, perPage: number) {
+  const orFilter = globalSearchOrFilter(term);
+  const { rows, count } = await fetchPage(
+    (query) => query.or(orFilter),
+    page,
+    perPage,
+  );
 
   return {
     meta: {
       query: { term },
-      count: count || 0,
+      count,
       page,
       perPage,
+      backend: "ilike_fallback",
     },
-    data: data ? data.map(rowToDhsjr) : [],
+    data: rows.map(rowToDhsjr),
   } as SearchResults;
 }
 
@@ -66,19 +94,33 @@ export async function getBookList() {
   return getStaticBookList();
 }
 
-export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
+export async function searchAll(
+  term: string,
+  page = DEFAULT_PAGE,
+  perPage = DEFAULT_PER_PAGE,
+) {
+  const query = cleanText(term);
+  if (!query) {
+    throw new Error("Search failed: search term is empty");
+  }
+  const pagination = normalizePagination(
+    page,
+    perPage,
+    SEARCH_ALL_MAX_PER_PAGE,
+  );
+
   const { data, error } = await supabase.rpc(
     "search_dhsjr_all_fields_by_word",
     {
-      search_query: term,
-      page_number: page,
-      page_size: perPage,
+      search_query: query,
+      page_number: pagination.page,
+      page_size: pagination.perPage,
     },
   );
 
   const { data: count, error: countError } = await supabase.rpc(
     "count_dhsjr_all_fields_by_word",
-    { search_query: term },
+    { search_query: query },
   );
 
   if (error || countError) {
@@ -86,8 +128,10 @@ export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
       error?.message || countError?.message || "Unknown error";
 
     // Graceful fallback when PGroonga operator/functions are unavailable.
+    // The fallback has no variant/kana normalization and no match-rank order,
+    // so the result is marked with backend: "ilike_fallback".
     if (shouldFallbackGlobalSearch(errorMessage)) {
-      return searchAllFallback(term, page, perPage);
+      return searchAllFallback(query, pagination.page, pagination.perPage);
     }
 
     throw new Error(`Search failed: ${errorMessage}`);
@@ -98,10 +142,11 @@ export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
 
   return {
     meta: {
-      query: { term },
+      query: { term: query },
       count: count || 0,
-      page,
-      perPage,
+      page: pagination.page,
+      perPage: pagination.perPage,
+      backend: "pgroonga",
     },
     data: convertedData,
   } as SearchResults;
@@ -109,69 +154,30 @@ export async function searchAll(term: string, page = PAGE, perPage = PER_PAGE) {
 
 export async function search(
   params: Partial<Inputs>,
-  page = PAGE,
-  perPage = PER_PAGE,
+  page = DEFAULT_PAGE,
+  perPage = DEFAULT_PER_PAGE,
 ) {
-  let query = supabase.from("dhsjr").select("*", { count: "exact" });
+  // Blank values are dropped; with nothing left, refuse rather than return the whole table.
+  const conditions = detailConditions(params);
+  if (conditions.length === 0) {
+    throw new Error("Search failed: no search condition");
+  }
+  const pagination = normalizePagination(page, perPage);
 
-  // Apply filters using Japanese column names
-  if (params.character) {
-    query = query.eq(FIELD_TO_COLUMN.character, params.character);
-  }
-  if (params.word) {
-    query = query.ilike(FIELD_TO_COLUMN.word, `%${params.word}%`);
-  }
-  if (params.book_name) {
-    query = query.ilike(FIELD_TO_COLUMN.book_name, `%${params.book_name}%`);
-  }
-  if (params.shoten) {
-    query = query.ilike(FIELD_TO_COLUMN.shoten, `%${params.shoten}%`);
-  }
-  if (params.kana) {
-    query = query.ilike(FIELD_TO_COLUMN.kana, `%${params.kana}%`);
-  }
-  if (params.shoten_word) {
-    query = query.ilike(FIELD_TO_COLUMN.shoten_word, `%${params.shoten_word}%`);
-  }
-  if (params.word_kana) {
-    query = query.ilike(FIELD_TO_COLUMN.word_kana, `%${params.word_kana}%`);
-  }
-  if (params.fanqie) {
-    query = query.ilike(FIELD_TO_COLUMN.fanqie, `%${params.fanqie}%`);
-  }
-  if (params.ruion) {
-    query = query.ilike(FIELD_TO_COLUMN.ruion, `%${params.ruion}%`);
-  }
-  if (params.etc) {
-    query = query.ilike(FIELD_TO_COLUMN.etc, `%${params.etc}%`);
-  }
-  if (params.notes) {
-    query = query.ilike(FIELD_TO_COLUMN.notes, `%${params.notes}%`);
-  }
-  if (params.book_id) {
-    query = query.eq(FIELD_TO_COLUMN.book_id, params.book_id);
-  }
-
-  // Apply pagination
-  query = query.range((page - 1) * perPage, page * perPage - 1);
-
-  const { data, count, error } = await query;
-
-  if (error) {
-    throw new Error(`Search failed: ${error.message}`);
-  }
-
-  // Convert rows to Dhsjr format
-  const convertedData = data ? data.map(rowToDhsjr) : [];
+  const { rows, count } = await fetchPage(
+    (query) => applyConditions(query, conditions),
+    pagination.page,
+    pagination.perPage,
+  );
 
   return {
     meta: {
       query: params,
-      count: count || 0,
-      page,
-      perPage,
+      count,
+      page: pagination.page,
+      perPage: pagination.perPage,
     },
-    data: convertedData,
+    data: rows.map(rowToDhsjr),
   } as SearchResults;
 }
 

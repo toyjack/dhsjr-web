@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getBookData, getBookList } from "@/lib/books";
 import { getWordRecords, search, searchAll } from "@/lib/db";
 import { rowToDhsjr } from "@/lib/field-mapping";
+import { detailConditions } from "@/lib/search-params";
 import { supabase } from "@/lib/supabase";
 import type { Inputs } from "@/types";
 import {
@@ -106,7 +107,8 @@ export function registerDhsjr(server: McpServer) {
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ page, per_page, ...params }) => {
-      const conditions = Object.entries(params).filter(([, value]) => value);
+      // Same parsing as db.search(): trimmed, blank values dropped.
+      const conditions = detailConditions(params);
       if (conditions.length === 0) {
         return errorResult(
           "検索条件を1つ以上指定してください（character, word, kana, shoten, fanqie, book_id ...）。",
@@ -115,7 +117,7 @@ export function registerDhsjr(server: McpServer) {
 
       const result = await search(params as Partial<Inputs>, page, per_page);
       const label = conditions
-        .map(([key, value]) => `${key}=${value}`)
+        .map(({ field, value }) => `${field}=${value}`)
         .join(", ");
       return recordsResult(result.data, {
         count: result.meta.count,
