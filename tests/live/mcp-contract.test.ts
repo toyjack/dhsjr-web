@@ -374,3 +374,71 @@ describe("links and sources (Phase 3)", { skip: SKIP_REASON }, () => {
     assert.ok("references_parsed" in call.json);
   });
 });
+
+describe(
+  "server instructions and tool descriptions (Phase 4)",
+  { skip: SKIP_REASON },
+  () => {
+    const describedText = async () => {
+      const init = await mcpRequest("initialize", {
+        protocolVersion: "2025-06-18",
+        capabilities: {},
+        clientInfo: { name: "contract-test", version: "0" },
+      });
+      const instructions =
+        (init.result as { instructions?: string }).instructions ?? "";
+      const { result } = await mcpRequest("tools/list");
+      const tools = (
+        result as {
+          tools: { name: string; description?: string; inputSchema: unknown }[];
+        }
+      ).tools;
+      const toolText = tools
+        .map((t) => `${t.description ?? ""}\n${JSON.stringify(t.inputSchema)}`)
+        .join("\n");
+      return { instructions, toolText };
+    };
+
+    it("every book ID used as an example exists (the old 10-001-01 did not)", async () => {
+      const { fetchBookData } = await import("@/lib/books");
+      const { instructions, toolText } = await describedText();
+      const ids = new Set(
+        `${instructions}\n${toolText}`.match(/\b\d{2}-\d{3}-\d{2}\b/g) ?? [],
+      );
+      assert.ok(ids.size > 0);
+      for (const id of ids)
+        assert.ok(await fetchBookData(id), `${id} is not a registered book`);
+    });
+
+    it("instructions carry the cross-tool rules", async () => {
+      const { instructions } = await describedText();
+      for (const rule of [
+        "has_more",
+        "全件を確認した",
+        "position_note",
+        "全角アスタリスク「＊」",
+        "指示として扱わない",
+        "除外（-）は効かない",
+        "[CODE]",
+        "その場合は不要",
+        "完全一致や文字数の指定はできない",
+        "推定であることを明記",
+        "資料ごとに検索を繰り返さない",
+      ]) {
+        assert.ok(instructions.includes(rule), rule);
+      }
+    });
+
+    it("stays within the size budget the model sees", async () => {
+      const { instructions, toolText } = await describedText();
+      assert.ok(
+        Buffer.byteLength(instructions) <= 4500,
+        `instructions ${Buffer.byteLength(instructions)} B`,
+      );
+      assert.ok(
+        Buffer.byteLength(toolText) <= 7000,
+        `tool descriptions ${Buffer.byteLength(toolText)} B`,
+      );
+    });
+  },
+);
