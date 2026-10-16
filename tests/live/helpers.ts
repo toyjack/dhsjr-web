@@ -29,8 +29,8 @@ export function isDetailOrder(rows: OrderedRow[]) {
 
 let nextId = 1;
 
-/** Call the /api/mcp route handler in-process with one JSON-RPC request. */
-export async function callMcpTool(name: string, args: object) {
+/** Send one JSON-RPC request to the /api/mcp route handler in-process. */
+export async function mcpRequest(method: string, params: object = {}) {
   const { POST } = await import("@/app/api/mcp/route");
   const res = await POST(
     new Request("http://localhost:3000/api/mcp", {
@@ -40,34 +40,46 @@ export async function callMcpTool(name: string, args: object) {
         accept: "application/json, text/event-stream",
         "mcp-protocol-version": "2025-06-18",
       },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: nextId++,
-        method: "tools/call",
-        params: { name, arguments: args },
-      }),
+      body: JSON.stringify({ jsonrpc: "2.0", id: nextId++, method, params }),
     }),
   );
   const text = await res.text();
-  const json = (res.headers.get("content-type") ?? "").includes(
+  const body = (res.headers.get("content-type") ?? "").includes(
     "text/event-stream",
   )
-    ? JSON.parse(
-        text
-          .split("\n")
-          .filter((line) => line.startsWith("data:"))
-          .at(-1)
-          ?.slice(5) ?? "null",
-      )
-    : JSON.parse(text);
-  const result = json.result as {
+    ? (text
+        .split("\n")
+        .filter((line) => line.startsWith("data:"))
+        .at(-1)
+        ?.slice(5) ?? "null")
+    : text;
+  return {
+    bytes: Buffer.byteLength(body),
+    ...(JSON.parse(body) as {
+      result?: Record<string, unknown>;
+      error?: { code: number; message: string };
+    }),
+  };
+}
+
+/** Call one tool in-process and split its result into the parts the tests check. */
+export async function callMcpTool(name: string, args: object) {
+  const { result, bytes } = await mcpRequest("tools/call", {
+    name,
+    arguments: args,
+  });
+  const { content, isError, structuredContent } = result as {
     content: { type: string; text: string }[];
     isError?: boolean;
+    structuredContent?: Record<string, unknown>;
   };
-  const payload = result.content[1]?.text;
+  const payload = content[1]?.text;
   return {
-    isError: result.isError ?? false,
-    summary: result.content[0]?.text ?? "",
+    bytes,
+    isError: isError ?? false,
+    content,
+    summary: content[0]?.text ?? "",
     json: payload ? JSON.parse(payload) : undefined,
+    structured: structuredContent,
   };
 }

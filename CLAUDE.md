@@ -58,7 +58,7 @@ The `Dhsjr` interface (English field names) and column mapping utilities are in 
 
 Search functions in [src/lib/db.ts](src/lib/db.ts):
 
-1. **getBookList()** - Returns static book list from `contents/books.json`
+1. **getBookList()** - Returns the book list from the `dhsjr-books` table (via `books.ts`)
 2. **searchAll(term, page, perPage)** - Global search using PGroonga RPC (`search_dhsjr_all_fields_by_word`), with automatic fallback to `ilike` if PGroonga is unavailable
 3. **search(params, page, perPage)** - Detailed search with field-specific `ilike` filtering via `Inputs` type, ordered by `資料番号, 資料内漢字番号, ID` (without an explicit order, range pagination repeats and skips rows)
 4. **getWord(bookId, wordIndexInBook)** - Fetch a single word record by book ID and word index
@@ -80,8 +80,10 @@ A read-only MCP (Model Context Protocol) server is exposed as a Next.js route ha
 
 - Route: [src/app/api/mcp/route.ts](src/app/api/mcp/route.ts)
 - Tools/resources: [src/lib/mcp/register.ts](src/lib/mcp/register.ts) — `search_all`, `search_detail`, `list_books`, `get_book`, `get_word`, `get_character`, plus the `dhsjr://book/{book_id}` resource template
-- Result formatting: [src/lib/mcp/format.ts](src/lib/mcp/format.ts) — every tool returns a human-readable summary block plus a compact JSON block (null fields stripped, links attached); `MAX_PER_PAGE` caps a call at 50 records
-- Tools reuse the existing `src/lib/db.ts` / `src/lib/books.ts` functions — add new capabilities there first, then register them
+- Output schemas: [src/lib/mcp/schemas.ts](src/lib/mcp/schemas.ts) — every tool declares an `outputSchema` and returns `structuredContent` as `{ schema_version, kind, meta, data }` (paging, query, backend and `warnings` in `meta`). zod objects publish `additionalProperties: false`, so any new field must be added to the schema; `tests/live/mcp-contract.test.ts` validates real results against the published schema with the SDK's Ajv
+- Result formatting: [src/lib/mcp/format.ts](src/lib/mcp/format.ts) — besides `structuredContent`, the text content keeps the original summary block plus the original JSON block (null fields stripped, links attached), unchanged for older clients; `list_books` returns the envelope as its JSON block. `response_mode: "compact"` (search_all, search_detail, get_word) drops the summary lines and `word_url`/`book_url`. `MAX_PER_PAGE` caps a call at 50 records. Claude Code passes only `structuredContent` to the model, so anything the model must see belongs in the envelope (e.g. `meta.warnings`), not only in the summary text
+- Errors: [src/lib/mcp/errors.ts](src/lib/mcp/errors.ts) — error results are text starting with `[CODE]` (`EMPTY_QUERY`, `NOT_FOUND`, `SEARCH_FAILED`, `DATABASE_UNAVAILABLE`, `TIMEOUT`) and carry no `structuredContent`; database messages go to the server log only. db/books functions throw `DbError` ([src/lib/db-error.ts](src/lib/db-error.ts)) so failures can be classified
+- Tools reuse the existing `src/lib/db.ts` / `src/lib/books.ts` functions — add new capabilities there first, then register them. MCP uses the throwing `fetchBookData` / `fetchBookList`; the Web keeps `getBookData` / `getBookList`, which turn database errors into "not found" / an empty list
 - `NEXT_PUBLIC_SITE_URL` (optional) turns links in tool results into absolute URLs
 - [.mcp.json](.mcp.json) wires the local dev endpoint for Claude Code
 
@@ -109,11 +111,11 @@ JotaiProvider > I18nProviderClient > ThemeProvider
 
 ### Book Data Management
 
-Book metadata is stored in `contents/books.json` and accessed via [src/lib/books.ts](src/lib/books.ts):
-- `getBookData(bookId)` - Get single book by ID
-- `getAllBooksFileNameList()` - Get all book IDs
+Book metadata is stored in the Supabase table `dhsjr-books` and accessed via [src/lib/books.ts](src/lib/books.ts):
+- `fetchBookData(bookId)` / `fetchBookList()` - Single book / all `book_id` + `title`; throw `DbError` on database errors (used by MCP)
+- `getBookData(bookId)` / `getBookList()` - Same, but return `null` / `[]` on errors (used by the Web pages and the layout's search panel)
 
-Book data structure includes: id, title, age, owner, pictures, guide, information, inputor, bibs.
+Columns include `book_id`, `title`, `period`, `holding_institution`, `input_responsible`, `image_info`, `input_notes`, `phonetic_info`, `references_raw`/`references_parsed` and `raw_markdown`. The script that fills this table is not in this repository (`pnpm data:gen-book` writes `contents/books.json`, which the app no longer reads).
 
 ### IIIF Manifest Mapping
 

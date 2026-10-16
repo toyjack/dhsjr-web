@@ -365,3 +365,4 @@ Phase 1 不涉及：MCP 输出格式（Phase 2）、URL 绝对化（Phase 3）�
 2. 回退时的警告还没有显示给 MCP 调用方（`meta.backend` 已有，按计划在 Phase 2 输出）。
 3. 仍未测试：T17（数据库故障）、ChatGPT 客户端；RLS / anon 权限仍需数据库负责人确认（不在 D7 授权范围内，未查询）。
 4. 既有问题未处理：`pnpm lint` 配置缺失、NEW-7 资料主表编号不一致。
+5. **Web 侧待修复（D15，下次更新 Web 时处理）：** NEW-6 在 Web 上的表现——书目读取失败时 `/books` 与检索面板的下拉框为空、`/book/[id]` 显示“未找到”。Phase 2 只修复 MCP 侧，详见 [DHSJR_MCP_PHASE2_DESIGN.md](DHSJR_MCP_PHASE2_DESIGN.md) §7。

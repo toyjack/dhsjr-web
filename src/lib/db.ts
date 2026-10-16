@@ -1,5 +1,6 @@
 import type { Inputs, SearchResults } from "@/types";
 import { getBookList as getStaticBookList } from "./books";
+import { dbError } from "./db-error";
 import { FIELD_TO_COLUMN, rowToDhsjr } from "./field-mapping";
 import {
   cleanText,
@@ -39,7 +40,7 @@ async function fetchPage(
   page: number,
   perPage: number,
 ) {
-  const { data, count, error } = await filter(selectDhsjr())
+  const { data, count, error, status } = await filter(selectDhsjr())
     .order(FIELD_TO_COLUMN.book_id, { ascending: true })
     .order(FIELD_TO_COLUMN.index_in_book, { ascending: true })
     .order(FIELD_TO_COLUMN.character_id, { ascending: true })
@@ -47,14 +48,18 @@ async function fetchPage(
 
   if (isRangeNotSatisfiable(error)) {
     // Past the last page: return an empty page with the real total, as searchAll does.
-    const { count: total, error: countError } = await filter(selectDhsjr(true));
+    const {
+      count: total,
+      error: countError,
+      status: countStatus,
+    } = await filter(selectDhsjr(true));
     if (countError) {
-      throw new Error(`Search failed: ${countError.message}`);
+      throw dbError("Search failed", countError, countStatus);
     }
     return { rows: [], count: total ?? 0 };
   }
   if (error) {
-    throw new Error(`Search failed: ${error.message}`);
+    throw dbError("Search failed", error, status);
   }
   return { rows: data ?? [], count: count ?? 0 };
 }
@@ -109,7 +114,7 @@ export async function searchAll(
     SEARCH_ALL_MAX_PER_PAGE,
   );
 
-  const { data, error } = await supabase.rpc(
+  const { data, error, status } = await supabase.rpc(
     "search_dhsjr_all_fields_by_word",
     {
       search_query: query,
@@ -118,23 +123,24 @@ export async function searchAll(
     },
   );
 
-  const { data: count, error: countError } = await supabase.rpc(
-    "count_dhsjr_all_fields_by_word",
-    { search_query: query },
-  );
+  const {
+    data: count,
+    error: countError,
+    status: countStatus,
+  } = await supabase.rpc("count_dhsjr_all_fields_by_word", {
+    search_query: query,
+  });
 
-  if (error || countError) {
-    const errorMessage =
-      error?.message || countError?.message || "Unknown error";
-
+  const failure = error ?? countError;
+  if (failure) {
     // Graceful fallback when PGroonga operator/functions are unavailable.
     // The fallback has no variant/kana normalization and no match-rank order,
     // so the result is marked with backend: "ilike_fallback".
-    if (shouldFallbackGlobalSearch(errorMessage)) {
+    if (shouldFallbackGlobalSearch(failure.message)) {
       return searchAllFallback(query, pagination.page, pagination.perPage);
     }
 
-    throw new Error(`Search failed: ${errorMessage}`);
+    throw dbError("Search failed", failure, error ? status : countStatus);
   }
 
   // Convert rows to Dhsjr format
@@ -194,7 +200,7 @@ export async function getWord(bookId: string, wordIndexInBook: number) {
 }
 
 export async function getWordRecords(bookId: string, wordIndexInBook: string) {
-  const { data, error } = await supabase
+  const { data, error, status } = await supabase
     .from("dhsjr")
     .select("*")
     .eq(FIELD_TO_COLUMN.book_id, bookId)
@@ -202,8 +208,37 @@ export async function getWordRecords(bookId: string, wordIndexInBook: string) {
     .order(FIELD_TO_COLUMN.index_in_book, { ascending: true });
 
   if (error) {
-    throw new Error(`Failed to fetch word: ${error.message}`);
+    throw dbError("Failed to fetch word", error, status);
   }
 
   return data ? data.map(rowToDhsjr) : [];
+}
+
+/** One character record by its ID, or null when it does not exist. */
+export async function getCharacterRecord(characterId: string) {
+  const { data, error, status } = await supabase
+    .from("dhsjr")
+    .select("*")
+    .eq(FIELD_TO_COLUMN.character_id, characterId)
+    .maybeSingle();
+
+  if (error) {
+    throw dbError("Failed to fetch character", error, status);
+  }
+
+  return data ? rowToDhsjr(data) : null;
+}
+
+/** Number of records with this book ID (books can have records but no bibliography entry). */
+export async function countBookRecords(bookId: string) {
+  const { count, error, status } = await supabase
+    .from("dhsjr")
+    .select(FIELD_TO_COLUMN.character_id, { count: "exact", head: true })
+    .eq(FIELD_TO_COLUMN.book_id, bookId);
+
+  if (error) {
+    throw dbError("Failed to count book records", error, status);
+  }
+
+  return count ?? 0;
 }

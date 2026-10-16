@@ -1,24 +1,41 @@
 import type { McpServer } from "@modelcontextprotocol/server";
-import { ResourceTemplate } from "@modelcontextprotocol/server";
-import { z } from "zod";
-import { getBookData, getBookList } from "@/lib/books";
-import { getWordRecords, search, searchAll } from "@/lib/db";
-import { rowToDhsjr } from "@/lib/field-mapping";
-import { detailConditions } from "@/lib/search-params";
-import { supabase } from "@/lib/supabase";
-import type { Inputs } from "@/types";
 import {
+  ResourceNotFoundError,
+  ResourceTemplate,
+} from "@modelcontextprotocol/server";
+import { z } from "zod";
+import { fetchBookData, fetchBookList } from "@/lib/books";
+import {
+  countBookRecords,
+  getCharacterRecord,
+  getWordRecords,
+  search,
+  searchAll,
+} from "@/lib/db";
+import { cleanText, detailConditions } from "@/lib/search-params";
+import type { Inputs } from "@/types";
+import { failureResult } from "./errors";
+import {
+  bookListResult,
+  bookResult,
   bookUrl,
-  compactRecord,
+  characterResult,
   DEFAULT_PER_PAGE,
   errorResult,
   MAX_PER_PAGE,
   manifestOf,
-  recordLine,
-  recordsResult,
-  textResult,
-  wordUrl,
+  searchResult,
+  wildcardWarnings,
+  wordResult,
 } from "./format";
+import {
+  getBookOutput,
+  getCharacterOutput,
+  getWordOutput,
+  listBooksOutput,
+  searchAllOutput,
+  searchDetailOutput,
+} from "./schemas";
 
 const pagination = {
   page: z.number().int().min(1).default(1).describe("ページ番号（1始まり）"),
@@ -29,6 +46,15 @@ const pagination = {
     .max(MAX_PER_PAGE)
     .default(DEFAULT_PER_PAGE)
     .describe(`1ページあたりの件数（最大 ${MAX_PER_PAGE}）`),
+};
+
+const responseMode = {
+  response_mode: z
+    .enum(["full", "compact"])
+    .default("full")
+    .describe(
+      "full（既定）: 1件1行の要約と全フィールドの JSON。compact: 要約行と word_url / book_url を省いた JSON のみ（研究用フィールドはすべて残る）",
+    ),
 };
 
 const detailFields = {
@@ -83,17 +109,35 @@ export function registerDhsjr(server: McpServer) {
             "検索語（漢字・仮名・ローマ字など）。異体字は正規化されるので新字体（経）でも旧字体（經）でも同じ結果になる。",
           ),
         ...pagination,
+        ...responseMode,
       }),
+      outputSchema: searchAllOutput,
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
-    async ({ term, page, per_page }) => {
-      const result = await searchAll(term, page, per_page);
-      return recordsResult(result.data, {
-        count: result.meta.count,
-        page,
-        perPage: per_page,
-        query: `全文検索「${term}」`,
-      });
+    async ({ term, page, per_page, response_mode }) => {
+      const query = cleanText(term);
+      if (!query) {
+        return errorResult(
+          "EMPTY_QUERY",
+          "検索語が空です。",
+          "漢字・仮名・ローマ字などを指定してください。",
+        );
+      }
+      try {
+        const result = await searchAll(query, page, per_page);
+        return searchResult(result.data, {
+          tool: "search_all",
+          query: { term: query },
+          label: `全文検索「${query}」`,
+          count: result.meta.count,
+          page: result.meta.page,
+          perPage: result.meta.perPage,
+          responseMode: response_mode,
+          backend: result.meta.backend ?? "pgroonga",
+        });
+      } catch (error) {
+        return failureResult("search_all", error);
+      }
     },
   );
 
@@ -103,28 +147,46 @@ export function registerDhsjr(server: McpServer) {
       title: "詳細検索",
       description:
         "フィールドを指定して DHSJR を検索する。単字（character）と資料番号（book_id）は完全一致、その他は部分一致。最低1つの条件が必要。見出しの単字・漢語は旧字体・正字で格納されているため「經」「醫」のように指定する（「経」「医」など新字体では 0 件になる）。",
-      inputSchema: z.object({ ...detailFields, ...pagination }),
+      inputSchema: z.object({
+        ...detailFields,
+        ...pagination,
+        ...responseMode,
+      }),
+      outputSchema: searchDetailOutput,
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
-    async ({ page, per_page, ...params }) => {
+    async ({ page, per_page, response_mode, ...params }) => {
       // Same parsing as db.search(): trimmed, blank values dropped.
       const conditions = detailConditions(params);
       if (conditions.length === 0) {
         return errorResult(
+          "EMPTY_QUERY",
           "検索条件を1つ以上指定してください（character, word, kana, shoten, fanqie, book_id ...）。",
         );
       }
 
-      const result = await search(params as Partial<Inputs>, page, per_page);
-      const label = conditions
-        .map(({ field, value }) => `${field}=${value}`)
-        .join(", ");
-      return recordsResult(result.data, {
-        count: result.meta.count,
-        page,
-        perPage: per_page,
-        query: `詳細検索（${label}）`,
-      });
+      try {
+        const result = await search(params as Partial<Inputs>, page, per_page);
+        const label = conditions
+          .map(({ field, value }) => `${field}=${value}`)
+          .join(", ");
+        return searchResult(result.data, {
+          tool: "search_detail",
+          query: {
+            conditions: Object.fromEntries(
+              conditions.map(({ field, value }) => [field, value]),
+            ),
+          },
+          label: `詳細検索（${label}）`,
+          count: result.meta.count,
+          page: result.meta.page,
+          perPage: result.meta.perPage,
+          responseMode: response_mode,
+          warnings: wildcardWarnings(conditions),
+        });
+      } catch (error) {
+        return failureResult("search_detail", error);
+      }
     },
   );
 
@@ -134,23 +196,15 @@ export function registerDhsjr(server: McpServer) {
       title: "資料一覧",
       description:
         "DHSJR に収録されている資料（資料番号と資料名）の一覧を返す。",
+      outputSchema: listBooksOutput,
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async () => {
-      const books = await getBookList();
-      const lines = books.map(
-        (book) =>
-          `${book.book_id} ${book.title ?? ""} ${bookUrl(book.book_id)}`,
-      );
-      return textResult(
-        [`資料 ${books.length}件`, ...lines].join("\n"),
-        books.map((book) => ({
-          book_id: book.book_id,
-          title: book.title,
-          url: bookUrl(book.book_id),
-          iiif_manifest: manifestOf(book.book_id),
-        })),
-      );
+      try {
+        return bookListResult(await fetchBookList());
+      } catch (error) {
+        return failureResult("list_books", error);
+      }
     },
   );
 
@@ -163,38 +217,31 @@ export function registerDhsjr(server: McpServer) {
       inputSchema: z.object({
         book_id: z.string().min(1).describe("資料番号 例: 10-001-01"),
       }),
+      outputSchema: getBookOutput,
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ book_id }) => {
-      const book = await getBookData(book_id);
-      if (!book) {
-        return errorResult(
-          `資料 ${book_id} は見つかりませんでした。list_books で資料番号を確認してください。`,
-        );
+      try {
+        const book = await fetchBookData(book_id);
+        if (book) {
+          return bookResult(book_id, book);
+        }
+        // Some book IDs have records but no bibliography entry (NEW-7).
+        const records = await countBookRecords(book_id);
+        return records > 0
+          ? errorResult(
+              "NOT_FOUND",
+              `資料 ${book_id} の書誌情報は登録されていません。`,
+              `この資料番号のレコードは ${records} 件あり、search_detail の book_id で検索できます。`,
+            )
+          : errorResult(
+              "NOT_FOUND",
+              `資料 ${book_id} は見つかりませんでした。`,
+              "list_books で資料番号を確認してください。",
+            );
+      } catch (error) {
+        return failureResult("get_book", error);
       }
-
-      // raw_markdown は dhsjr://book/{book_id} リソースで返すのでここでは省く。
-      const {
-        raw_markdown: _rawMarkdown,
-        parse_warnings: _parseWarnings,
-        source_hash: _sourceHash,
-        git_commit: _gitCommit,
-        ...rest
-      } = book;
-      const summary = [
-        `${book.title ?? book.book_id}（${book.book_id}）`,
-        book.period ? `年代: ${book.period}` : null,
-        book.holding_institution ? `所蔵: ${book.holding_institution}` : null,
-        bookUrl(book.book_id),
-      ]
-        .filter(Boolean)
-        .join("\n");
-
-      return textResult(summary, {
-        ...rest,
-        url: bookUrl(book.book_id),
-        iiif_manifest: manifestOf(book.book_id),
-      });
     },
   );
 
@@ -207,30 +254,25 @@ export function registerDhsjr(server: McpServer) {
       inputSchema: z.object({
         book_id: z.string().min(1).describe("資料番号 例: 10-001-01"),
         word_index_in_book: z.string().min(1).describe("資料内漢語番号"),
+        ...responseMode,
       }),
+      outputSchema: getWordOutput,
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
-    async ({ book_id, word_index_in_book }) => {
-      const records = await getWordRecords(book_id, word_index_in_book);
-      if (records.length === 0) {
-        return errorResult(
-          `漢語 ${book_id}_${word_index_in_book} は見つかりませんでした。`,
-        );
+    async ({ book_id, word_index_in_book, response_mode }) => {
+      try {
+        const records = await getWordRecords(book_id, word_index_in_book);
+        if (records.length === 0) {
+          return errorResult(
+            "NOT_FOUND",
+            `漢語 ${book_id}_${word_index_in_book} は見つかりませんでした。`,
+            "book_id と word_index_in_book は検索結果のレコードの値を指定してください。",
+          );
+        }
+        return wordResult(book_id, word_index_in_book, records, response_mode);
+      } catch (error) {
+        return failureResult("get_word", error);
       }
-
-      const head = records[0];
-      const summary = [
-        `${head.word ?? head.word_original ?? ""}（${records.length}字）${wordUrl(book_id, word_index_in_book)}`,
-        ...records.map((record, i) => recordLine(record, i + 1)),
-      ].join("\n");
-
-      return textResult(summary, {
-        book_id,
-        word_index_in_book,
-        word: head.word,
-        word_url: wordUrl(book_id, word_index_in_book),
-        records: records.map(compactRecord),
-      });
     },
   );
 
@@ -246,24 +288,23 @@ export function registerDhsjr(server: McpServer) {
           .min(1)
           .describe("単字ID（検索結果の character_id）"),
       }),
+      outputSchema: getCharacterOutput,
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ character_id }) => {
-      const { data, error } = await supabase
-        .from("dhsjr")
-        .select("*")
-        .eq("ID", character_id)
-        .maybeSingle();
-
-      if (error) {
-        return errorResult(`取得に失敗しました: ${error.message}`);
+      try {
+        const record = await getCharacterRecord(character_id);
+        if (!record) {
+          return errorResult(
+            "NOT_FOUND",
+            `単字ID ${character_id} は見つかりませんでした。`,
+            "検索結果の character_id を指定してください。",
+          );
+        }
+        return characterResult(character_id, record);
+      } catch (error) {
+        return failureResult("get_character", error);
       }
-      if (!data) {
-        return errorResult(`単字ID ${character_id} は見つかりませんでした。`);
-      }
-
-      const record = rowToDhsjr(data);
-      return textResult(recordLine(record), compactRecord(record));
     },
   );
 
@@ -271,7 +312,7 @@ export function registerDhsjr(server: McpServer) {
     "book-bibliography",
     new ResourceTemplate("dhsjr://book/{book_id}", {
       list: async () => {
-        const books = await getBookList();
+        const books = await fetchBookList();
         return {
           resources: books.map((book) => ({
             uri: `dhsjr://book/${book.book_id}`,
@@ -284,7 +325,7 @@ export function registerDhsjr(server: McpServer) {
       },
       complete: {
         book_id: async (value) => {
-          const books = await getBookList();
+          const books = await fetchBookList();
           return books
             .map((book) => book.book_id)
             .filter((id) => id.startsWith(value))
@@ -301,9 +342,10 @@ export function registerDhsjr(server: McpServer) {
       const bookId = Array.isArray(variables.book_id)
         ? variables.book_id[0]
         : variables.book_id;
-      const book = bookId ? await getBookData(bookId) : null;
+      const book = bookId ? await fetchBookData(bookId) : null;
       if (!book) {
-        throw new Error(
+        throw new ResourceNotFoundError(
+          uri.href,
           `資料 ${bookId ?? "(未指定)"} は見つかりませんでした。`,
         );
       }
