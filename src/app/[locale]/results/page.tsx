@@ -2,6 +2,7 @@ import PaginationPanel from "@/components/pagination-panel";
 import PerPageSetting from "@/components/per-page-setting";
 import ResultsTable from "@/components/results-table";
 import { search, searchAll } from "@/lib/db";
+import { cleanText, detailConditions } from "@/lib/search-params";
 import { getI18n } from "@/locales/server";
 import type { Inputs, SearchResults } from "@/types";
 import type { Metadata } from "next";
@@ -22,19 +23,20 @@ export default async function ResultPage(props: ResultPageProps) {
   const searchParams = await props.searchParams;
   const t = await getI18n();
 
-  // Check if searchParams is empty or all values are empty strings
-  const hasSearchTerms = searchParams && Object.entries(searchParams).some(
-    ([key, value]) => key !== 'page' && key !== 'perPage' && value && String(value).trim() !== ''
-  );
+  // Same parsing as the MCP tools: blank values and unknown params are not conditions.
+  // Missing or invalid page/perPage fall back to defaults inside searchAll/search.
+  const query = cleanText(searchParams.query);
+  const hasSearchTerms =
+    query !== undefined || detailConditions(searchParams).length > 0;
   if (!hasSearchTerms) {
     return <div className="p-4 text-center">{t("searchConditionRequired")}</div>;
   }
 
   let data: SearchResults;
   try {
-    if (searchParams.query) {
+    if (query) {
       data = await searchAll(
-        searchParams.query as string,
+        query,
         Number(searchParams.page),
         Number(searchParams.perPage)
       );

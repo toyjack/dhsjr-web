@@ -30,6 +30,9 @@ export type SearchResults = {
     count: number,
     page: number,
     perPage: number,
+    // Set by searchAll: which engine produced the rows. "ilike_fallback" has no
+    // variant/kana normalization and no match-rank order.
+    backend?: "pgroonga" | "ilike_fallback",
   },
   data: Dhsjr[],
 }
