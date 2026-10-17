@@ -175,7 +175,7 @@ When running `data:update`:
 - Uses `onConflict: "character_id"` to handle both new and existing records
 
 ### Code Quality
-- `pnpm lint` runs ESLint (eslint-config-next)
+- `pnpm lint` runs ESLint 9 with the flat config in `eslint.config.mjs` (eslint-config-next 16). `next build` lints too, so a rule left at "error" fails the production build; three rules with pre-existing findings are set to "warn" there
 - Biome handles formatting (2-space indentation) and import organization; configured in `biome.json`
 
 ## Database Environment Variables
